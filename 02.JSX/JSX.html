@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h2>前端JS框架列表</h2>
+        <div id="example1"></div>
+        <div id="example2"></div>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react/16.2.0/umd/react.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react-dom/16.2.0/umd/react-dom.development.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        <script type="text/babel">
+            let names = ['jquery','reptoo','angular','react全家桶','vue全家桶']
+            let lis = []
+            names.forEach((name,index)=>lis.push(<li key={index}>{name}</li>))
+            const ul = <ul>{lis}</ul>
+            ReactDOM.render(ul,document.getElementById("example1"))
+            const ul2 = <ul>{
+                names.map((name,index)=><li key={index}>{name}</li>)
+            }</ul>
+            ReactDOM.render(ul2,document.getElementById("example2"))
+        </script>
+    </body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h2>两种方式创建虚拟DOM</h2>
+        <div id="example1"></div>
+        <div id="example2"></div>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react/16.2.0/umd/react.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react-dom/16.2.0/umd/react-dom.development.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        <script type="text/babel">
+            const msg = 'I like you!'
+            const myId = 'Jast'
+            const vDOM1 = React.createElement('h2',{id:myId},msg.toUpperCase())
+            const domContainer = document.getElementById('example1')
+            ReactDOM.render(vDOM1,domContainer)
+        </script>
+
+        <script type="text/babel">
+            const vDOM2 = <h3 id={myId.toUpperCase()}>{msg.toLowerCase()}</h3>
+            ReactDOM.render(vDOM2,document.getElementById('example2'))
+        </script>
+    </body>
+</html>
