@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>08.component_lifecycle</title>
+    </head>
+    <body>
+        <div id="example"></div>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react/16.2.0/umd/react.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react-dom/16.2.0/umd/react-dom.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/prop-types/15.7.2/prop-types.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        <script type="text/babel">
+            class Fade extends React.Component{
+                constructor(props){
+                    super(props)
+                    console.log("constructor():创建组件对象")
+                    this.state = {
+                        opacity: 1
+                    }
+                    this.removeComponent = this.removeComponent.bind(this)
+                }
+                componentWillMount(){
+                    console.log('componnetWillMount()：初始化将要挂载')
+                }
+                componentDidMount(){
+                    console.log('componentDidMount()：初始化已经挂载')
+                    this.intervalId = setInterval(function(){
+                        console.log('----')
+                        let {opacity} = this.state
+                        opacity -= 0.1
+                        if(opacity<=0){
+                            opacity = 1
+                        }
+                        this.setState({opacity})
+                    }.bind(this),200)
+                }
+                componentWillUpdate(){
+                    console.log('componentWillUpdate()：将要更新')
+                }
+                componentDidUpdate(){
+                    console.log('componentDidUpdate()：已经更新')
+                }
+                componentWillUnmount(){
+                    console.log('componentWillUnmount（）：将要被移除')
+                    clearInterval(this.intervalId)
+                }
+                removeComponent(){
+                    ReactDOM.unmountComponentAtNode(document.getElementById('example'))
+                }
+
+                render(){
+                    console.log('render() 渲染组件')
+                    return (
+                        <div>
+                            <h2 style={{opacity:this.state.opacity}}>{this.props.content}</h2>
+                            <button onClick={this.removeComponent}>不活了</button>
+                        </div>
+                    )
+                }
+            }
+            ReactDOM.render(<Fade content="react 学不会，怎么办？"/>,document.getElementById("example"))
+        </script>
+    </body>
+</html>
