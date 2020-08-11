@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>07.components_form</title>
+    </head>
+    <body>
+        <div id="example"></div>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react/16.2.0/umd/react.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react-dom/16.2.0/umd/react-dom.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/prop-types/15.7.2/prop-types.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        <script type="text/babel">
+            class LoginForm extends React.Component{
+                constructor(props){
+                    super(props)
+                    this.state={
+                        username:''
+                    }
+                    this.handleChange = this.handleChange.bind(this)
+                    this.handleSubmit = this.handleSubmit.bind(this)
+                }
+                handleChange(event){
+                    this.setState({username:event.target.value})
+                }
+                handleSubmit(event){
+                    alert(`准备提交的用户名为：${this.state.username},密码：${this.pwdInput.value}`)
+                    event.preventDefault()
+                }
+                render(){
+                    return (
+                        <form onSubmit={this.handleSubmit} action="/text">
+                            <label>
+                                用户名：
+                                <input type="text" value={this.state.username} onChange={this.handleChange}>
+                                </input>{  }
+                            </label>
+                            <label>
+                                密码：
+                                <input type="password" ref={input=>this.pwdInput = input}>
+                                </input>{  }
+                            </label>
+                            <input type="submit" value="登入"/>
+                        </form>
+                    )
+                }
+            }
+            ReactDOM.render(<LoginForm/>,document.getElementById("example"))
+        </script>
+    </body>
+</html>

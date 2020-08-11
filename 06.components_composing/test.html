@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>06.components_composing</title>
+    </head>
+    <body>
+        <div id="example"></div>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react/16.2.0/umd/react.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react-dom/16.2.0/umd/react-dom.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/prop-types/15.7.2/prop-types.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        <script type="text/babel">
+            class App extends React.Component{
+                constructor(props){
+                    super(props)
+                    this.state = {
+                        todos:['吃饭','睡觉','打豆豆']
+                    }
+                    this.add = this.add.bind(this)
+                }
+
+                add(todo){
+                    const {todos} = this.state
+                    todos.unshift(todo)
+                    this.setState({todos})
+                }
+
+                render(){
+                    const {todos} = this.state
+                    return (
+                        <div>
+                            <TodoAdd add={this.add} count={todos.length}></TodoAdd>
+                            <TodoList todos = {todos}></TodoList>
+                        </div>
+                    )
+                }
+            }
+            class TodoAdd extends React.Component{
+                constructor(props){
+                    super(props)
+                    this.addTodo = this.addTodo.bind(this)
+                }
+                addTodo(){
+                    const text = this.input.value.trim()
+                    if(!text){
+                        return
+                    }
+                    this.props.add(text)
+                    this.input.value = ''
+                }
+                render(){
+                    return(
+                        <div>
+                            <h2>Simple TODO List </h2>
+                            <input type="text" ref={input=>this.input=input}/>
+                            <button onClick={this.addTodo}>Add #{this.props.count}</button>
+                        </div>
+                    )
+                }
+            }
+            TodoAdd.propTypes = {
+                add: PropTypes.func.isRequired,
+                count: PropTypes.number.isRequired
+            }
+            class TodoList extends React.Component{
+                render() {
+                    const {todos} = this.props
+                    return (
+                        <ul>
+                            {
+                                todos.map((todo,index)=><li key={index}>{todo}</li>)
+                            }
+                        </ul>
+                    )
+                }
+            }
+
+            TodoList.propTypes = {
+                todos:PropTypes.array.isRequired
+            }
+
+            ReactDOM.render(<App/>,document.getElementById("example"))
+        </script>
+    </body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <div id="example"></div>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react/16.2.0/umd/react.development.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/react-dom/16.2.0/umd/react-dom.development.js"></script>
+        <script type="text/javascript" src="https://cdn.bootcdn.net/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+        <script type="text/babel">
+            class Like extends React.Component{
+                constructor(props){
+                    super(props)
+                    this.state={
+                        isLikeMe:false
+                    }
+                    this.handleClick = this.handleClick.bind(this)
+                }
+                handleClick(){
+                    console.log('handleClick()',this)
+                    const isLikeMe = !this.state.isLikeMe
+                    this.setState({isLikeMe})
+                }
+                render(){
+                    const {isLikeMe} = this.state
+                    return <h2 onClick={this.handleClick}>{isLikeMe?'你喜欢我':'我喜欢你'}</h2>
+                }
+            }
+            ReactDOM.render(<Like />,document.getElementById("example"))
+        </script>
+    </body>
+</html>
