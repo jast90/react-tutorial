@@ -1,5 +1,12 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## 目录/文件说明
+
+- public/index.html：主页静态页面
+- src/index.js: react主页js，负责渲染组件到主页静态页面
+- components/: 组件列表
+
+
 ## Available Scripts
 
 In the project directory, you can run:
