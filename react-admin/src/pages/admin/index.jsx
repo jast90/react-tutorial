@@ -31,7 +31,7 @@ export default class Admin extends Component{
             <div>
                 <Layout style={{ minHeight: '100vh' }}>
                     <Sider
-                          collapsible 
+                          //collapsible 
                           collapsed={this.state.collapsed} onCollapse={this.onCollapse}
                     ><LeftNav/></Sider>
                     <Layout>
