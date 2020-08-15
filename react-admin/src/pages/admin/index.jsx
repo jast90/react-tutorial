@@ -1,6 +1,6 @@
 import React,{ Component } from "react";
-import {Redirect,Switch, Route} from 'react-router-dom'
-import {Layout, Menu, Row,Col} from 'antd'
+import {Redirect,Switch, Route,} from 'react-router-dom'
+import {Layout} from 'antd'
 import Home from '../home'
 import Product from '../product'
 
@@ -49,3 +49,4 @@ export default class Admin extends Component{
         )
     }
 }
+

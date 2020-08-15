@@ -1,14 +1,14 @@
 import React,{ Component } from "react";
-import { Form, Input, Button, Checkbox ,message} from 'antd';
+import { Form, Input, Button ,message} from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types'
-import {Redirect} from 'react-router-dom'
+import {Redirect, withRouter} from 'react-router-dom'
 
 import './login.css'
 import {reqLogin} from '../../api'
 import storageUtils from '../../utils/storageUtils'
 
-export default class Login extends Component{
+export class Login extends Component{
 
     login = async (username,password)=>{
         console.log(username,password)
@@ -96,3 +96,5 @@ class LoginForm extends Component{
         )
     }
 }
+
+export default withRouter(Login)
