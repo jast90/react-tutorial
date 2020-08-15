@@ -14,22 +14,25 @@ export const reqMenuList = ()=>{
     return [
         {path:"/home",title:"首页",icon:"<PieChartOutlined />"},
         {path:"/account",title:"账户管理",icon:"<PieChartOutlined />",children:[{
+            path:"/account",title:"账户"
+        },{
             path:"/account/history",title:"账户明细"
         },{
             path:"/account/pay/config",title:"账户支付配置"
         },{
             path:"/account/pay/info",title:"账户支付信息"
         }]},
-        {path:"/product",title:"商品管理",icon:"<PieChartOutlined />"},
-        {path:"/order",title:"订单管理",icon:"<PieChartOutlined />"},
+        {path:"/order",title:"订单管理",icon:"<PieChartOutlined />",children:[
+            {path:"/payment/order",title:"支付订单",icon:"<PieChartOutlined />"}
+        ]},
         {path:"/pay",title:"支付管理",icon:"<PieChartOutlined />",children:[
             {path:"/pay/product",title:"支付产品",icon:"<PieChartOutlined />"},
             {path:"/pay/way",title:"支付方式",icon:"<PieChartOutlined />"},
         ]},
         {path:"/profit",title:"分账管理",icon:"<PieChartOutlined />",children:[
-            {path:"/profit/order",title:"分账订单",icon:"<PieChartOutlined />"},
-            {path:"/profit/receiver",title:"分账接收方",icon:"<PieChartOutlined />"},
-            {path:"/profit/return/order",title:"分账退回订单",icon:"<PieChartOutlined />"},
+            {path:"/profit/sharing/order",title:"分账订单",icon:"<PieChartOutlined />"},
+            {path:"/profit/sharing/receiver",title:"分账接收方",icon:"<PieChartOutlined />"},
+            {path:"/profit/sharing/return/order",title:"分账退回订单",icon:"<PieChartOutlined />"},
         ]},
         {path:"/red/pack/order",title:"红包订单",icon:"<PieChartOutlined />"},
         {path:"/transfer/order",title:"转账订单",icon:"<PieChartOutlined />"},

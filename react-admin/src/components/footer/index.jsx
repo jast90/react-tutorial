@@ -4,7 +4,7 @@ export default class MyFooter extends Component{
 
     render(){
         return (
-            <div>My Footer</div>
+            <div>支付管理后台</div>
         )
     }
 
