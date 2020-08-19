@@ -47,7 +47,7 @@ export default class Admin extends Component{
                     ><LeftNav/></Sider>
                     <Layout>
                         <Header><MyHeader /></Header>
-                        <Content>
+                        <Content style={{ margin: '16px' }}>
                             <Switch>
                                 <Route path='/home' component={Home}/>
                                 <Route path='/account/history' component={AccountHistory}/>

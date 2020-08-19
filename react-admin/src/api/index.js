@@ -38,3 +38,107 @@ export const reqMenuList = ()=>{
         {path:"/transfer/order",title:"转账订单",icon:"<PieChartOutlined />"},
     ]
 }
+
+/**
+ * 获取订单列表
+ */
+export const reqOrderList = () => {
+    let data = [
+        {
+          id: '1',
+          orderNo: '123213123',
+          orderAmount: 20.5,
+          payAmount: 20.5,
+          orderFrom: '小程序',
+        },
+        {
+            id: '2',
+            orderNo: '123213123',
+            orderAmount: 20.5,
+            payAmount: 20.5,
+            orderFrom: '小程序',
+        },
+        {
+            id: '3',
+            orderNo: '123213123',
+            orderAmount: 20.5,
+            payAmount: 20.5,
+            orderFrom: '小程序',
+        },
+        {
+            id: '4',
+            orderNo: '123213123',
+            orderAmount: 20.5,
+            payAmount: 20.5,
+            orderFrom: '小程序',
+        },
+        {
+            id: '5',
+            orderNo: '123213123',
+            orderAmount: 20.5,
+            payAmount: 20.5,
+            orderFrom: '小程序',
+          },
+          {
+              id: '6',
+              orderNo: '123213123',
+              orderAmount: 20.5,
+              payAmount: 20.5,
+              orderFrom: '小程序',
+          },
+          {
+              id: '7',
+              orderNo: '123213123',
+              orderAmount: 20.5,
+              payAmount: 20.5,
+              orderFrom: '小程序',
+          },
+          {
+              id: '8',
+              orderNo: '123213123',
+              orderAmount: 20.5,
+              payAmount: 20.5,
+              orderFrom: '小程序',
+          },
+          {
+            id: '9',
+            orderNo: '123213123',
+            orderAmount: 20.5,
+            payAmount: 20.5,
+            orderFrom: '小程序',
+          },
+          {
+              id: '10',
+              orderNo: '123213123',
+              orderAmount: 20.5,
+              payAmount: 20.5,
+              orderFrom: '小程序',
+          },
+          {
+              id: '11',
+              orderNo: '123213123',
+              orderAmount: 20.5,
+              payAmount: 20.5,
+              orderFrom: '小程序',
+          },
+          {
+              id: '12',
+              orderNo: '123213123',
+              orderAmount: 20.5,
+              payAmount: 20.5,
+              orderFrom: '小程序',
+          },
+      ];
+    return data;
+}
+
+export const reqPayProductList= ()=>{
+    let data = [{
+        productCode:"123",
+        productName:"微信支付",
+        status:"通过",
+        auditStatus: "审核通过",
+        createTime:"2020-08-19 09:51:00"
+    }]
+    return data
+}
