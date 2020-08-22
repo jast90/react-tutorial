@@ -10,6 +10,7 @@ export const reqLogin = (username,passowrd)=>{
     return {code:0,data:{id:123,name:"admin"},msg:"用户名密码错误"}
 }
 
+
 export const reqMenuList = ()=>{
     return [
         {path:"/home",title:"首页",icon:"<PieChartOutlined />"},
@@ -132,13 +133,6 @@ export const reqOrderList = () => {
     return data;
 }
 
-export const reqPayProductList= ()=>{
-    let data = [{
-        productCode:"123",
-        productName:"微信支付",
-        status:"通过",
-        auditStatus: "审核通过",
-        createTime:"2020-08-19 09:51:00"
-    }]
-    return data
-}
+export const reqPayProductList =  (pageNumber=1,pageSize=15) => request("/pay/product/page",{"pageRequest":{pageNumber,pageSize}},"POST")
+
+export const reqAddPayProduct = (productName,productCode,auditStatus)=> request("/pay/product",{productName,productCode,auditStatus},"POST")

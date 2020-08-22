@@ -1,7 +1,7 @@
 import React,{Component} from 'react'
-import { Modal,Form, Row, Col, Input, Button,Table, Space,DatePicker,Switch} from 'antd';
+import { Modal,Form, Row, Col, Input, Button,Table, Space,DatePicker,Switch, message} from 'antd';
 
-import {reqPayProductList} from '../../api'
+import {reqPayProductList,reqAddPayProduct} from '../../api'
 
 const { RangePicker } = DatePicker;
 
@@ -72,6 +72,16 @@ export default class PayProduct extends Component{
     state = {
         addVisible: false,
         updateVisible: false,
+        data: [],
+        pagination:{
+            current: 1,
+            pageSize: 15
+        },
+        loading: false,
+    }
+
+    setData(data){
+        this.setState({data})
     }
 
     setAddVisible(addVisible){
@@ -82,6 +92,8 @@ export default class PayProduct extends Component{
         this.setState({updateVisible})
         if(updateVisible){
             this.payProduct = payProduct
+        }else{
+            this.payProduct = {}
         }
     }
 
@@ -164,15 +176,40 @@ export default class PayProduct extends Component{
           },
       ];
     
-    data = []
+    // data = []
 
-    componentWillMount(){
-        this.data = reqPayProductList()
-        
+    getPayProductList = async (current,pageSize) =>{
+        this.setState({ loading: true });
+        const result = await reqPayProductList(current,pageSize)
+        this.setState({
+            loading: false,
+            data:result.data.content,
+            pagination:{
+                current:current,
+                pageSize:pageSize,
+                total:result.data.total
+            }
+        })
+    }
+
+    handleTableChange = (pagination,filter,sorter)=>{
+        this.getPayProductList(pagination.current,pagination.pageSize)
+    }
+
+    addPayProduct =  async (productName,productCode,auditStatus) => {
+        const result = await reqAddPayProduct(productName,productCode,auditStatus)
+        return result;
+    }
+
+    componentDidMount(){
+        const {pagination} = this.state
+        const {current,pageSize} = pagination
+        this.getPayProductList(current,pageSize)   
     }
 
 
     render(){
+        const { data, pagination, loading } = this.state;
         return (
             <div>
                 <Form
@@ -211,17 +248,35 @@ export default class PayProduct extends Component{
                         <Button onClick={()=>this.setAddVisible(true)}>添加</Button>
                     </Col>
                 </Row>
-                <Table columns={this.columns} dataSource={this.data} />
+                <Table 
+                    columns={this.columns} 
+                    dataSource={data} 
+                    pagination={pagination}
+                    loading={loading}
+                    onChange={this.handleTableChange}
+                    />
                 <ModalForm 
                     visible={this.state.addVisible} 
                     onCancel={()=>{this.setAddVisible(false)}} 
-                    onAddPayProduct={()=>{
-                        this.setAddVisible(false)
+                    onAddPayProduct={(values)=>{
+                        const result = this.addPayProduct(values.productName,values.productCode,values.auditStatus)
+                        debugger
+                        if(result.code != 0){
+                            if(result.msg){
+                                message.error(result.msg)
+                            }
+                        }else{
+                            this.setAddVisible(false)
+                        }
+                        
                     }}
                 />
                 <ModalForm 
                     visible={this.state.updateVisible} 
-                    onCancel={()=>{this.setUpdateVisible(false)}} 
+                    onCancel={()=>{
+                        this.setUpdateVisible(false)
+                        this.payProduct = {}
+                    }} 
                     onAddPayProduct={()=>{
                         this.setUpdateVisible(false)
                     }}
