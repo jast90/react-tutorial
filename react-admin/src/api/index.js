@@ -55,3 +55,23 @@ export const reqPayProductList =  (pageNumber=1,pageSize=15,domain) => requestPa
 
 export const reqAddPayProduct = (productName,productCode,auditStatus)=> request("/pay/product",{productName,productCode,auditStatus},"POST")
 
+export const reqAccountPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/page",pageNumber,pageSize,domain)
+
+export const reqAccountHistoryPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/history/page",pageNumber,pageSize,domain)
+
+export const reqAccountPayConfigPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/page/config/page",pageNumber,pageSize,domain)
+
+export const reqAccountPayInfoPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/page/info/page",pageNumber,pageSize,domain)
+
+export const reqPayWayPage = (pageNumber=1,pageSize=15,domain) => requestPage("/pay/way/page",pageNumber,pageSize,domain)
+
+export const reqProfitSharingOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/profit/sharing/order/page",pageNumber,pageSize,domain)
+
+export const reqProfitSharingReceiverPage = (pageNumber=1,pageSize=15,domain) => requestPage("/profit/sharing/receiver/page",pageNumber,pageSize,domain)
+
+export const reqProfitSharingReturnOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/profit/sharing/return/order/page",pageNumber,pageSize,domain)
+
+export const reqRedPackOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/red/pack/order/page",pageNumber,pageSize,domain)
+
+export const reqTransferOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/transfer/order/page",pageNumber,pageSize,domain)
+

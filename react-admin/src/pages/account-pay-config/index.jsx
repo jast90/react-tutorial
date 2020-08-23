@@ -2,7 +2,7 @@ import React,{Component,useState} from 'react'
 import { Select,Form, Row, Col, Input, Button,Table, Space,DatePicker,Card} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
-import {reqOrderPage} from '../../api'
+import {reqAccountPayConfigPage} from '../../api'
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -176,7 +176,7 @@ export default class Account extends Component{
             pagination = this.state.pagination
         }
         const {current,pageSize} = pagination
-        reqOrderPage(current,pageSize,condition).then(result=>{
+        reqAccountPayConfigPage(current,pageSize,condition).then(result=>{
             this.setState({
                 loading: false,
                 data:result.data.content,

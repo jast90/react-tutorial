@@ -2,7 +2,7 @@ import React,{Component,useState} from 'react'
 import { Select,Form, Row, Col, Input, Button,Table, Space,DatePicker,Card} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
-import {reqOrderPage} from '../../api'
+import {reqProfitSharingReceiverPage} from '../../api'
 
 const { RangePicker } = DatePicker;
 const {Option} = Select
@@ -122,43 +122,31 @@ export default class Account extends Component{
 
     columns = [
         {
-          title: '订单编号',
-          dataIndex: 'orderNo',
-          key: 'orderNo',
+          title: '分账接收方帐号',
+          dataIndex: 'account',
+          key: 'account',
         //   render: text => <a>{text}</a>,
         },
         {
-            title: '订单状态',
-            dataIndex: 'status',
-            key: 'status',
+            title: '分账接收方类型',
+            dataIndex: 'type',
+            key: 'type',
           //   render: text => <a>{text}</a>,
         },
         {
-          title: '订单金额',
-          dataIndex: 'orderAmount',
-          key: 'orderAmount',
+          title: '分账接收方全称',
+          dataIndex: 'name',
+          key: 'name',
         },
         {
-          title: '实付金额',
-          dataIndex: 'payAmount',
-          key: 'payAmount',
+          title: '与分账方的关系类型',
+          dataIndex: 'relationType',
+          key: 'relationType',
         },
         {
-          title: '订单来源',
-          dataIndex: 'orderFrom',
-          key: 'orderFrom',
-        },
-        {
-            title: '下单时间',
-            dataIndex: 'orderTime',
-            key: 'orderTime',
-          //   render: text => <a>{text}</a>,
-        },
-        {
-            title: '支付时间',
-            dataIndex: 'payTime',
-            key: 'payTime',
-          //   render: text => <a>{text}</a>,
+          title: '自定义的分账关系',
+          dataIndex: 'customRelation',
+          key: 'customRelation',
         },
         {
           title: '操作',
@@ -186,7 +174,7 @@ export default class Account extends Component{
             pagination = this.state.pagination
         }
         const {current,pageSize} = pagination
-        reqOrderPage(current,pageSize,condition).then(result=>{
+        reqProfitSharingReceiverPage(current,pageSize,condition).then(result=>{
             this.setState({
                 loading: false,
                 data:result.data.content,
