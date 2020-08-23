@@ -133,6 +133,6 @@ export const reqOrderList = () => {
     return data;
 }
 
-export const reqPayProductList =  (pageNumber=1,pageSize=15) => request("/pay/product/page",{"pageRequest":{pageNumber,pageSize}},"POST")
+export const reqPayProductList =  (pageNumber=1,pageSize=15,domain) => request("/pay/product/page",{"pageRequest":{pageNumber,pageSize},"domain":domain},"POST")
 
 export const reqAddPayProduct = (productName,productCode,auditStatus)=> request("/pay/product",{productName,productCode,auditStatus},"POST")

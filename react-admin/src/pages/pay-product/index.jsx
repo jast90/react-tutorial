@@ -1,7 +1,9 @@
 import React,{Component} from 'react'
-import { Modal,Form, Row, Col, Input, Button,Table, Space,DatePicker,Switch, message} from 'antd';
+import { Modal,Form, Row, Col, Input, Button,Table, Space,DatePicker,Switch, message,Card} from 'antd';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import {reqPayProductList,reqAddPayProduct} from '../../api'
+import { useState } from 'react';
 
 const { RangePicker } = DatePicker;
 
@@ -67,6 +69,89 @@ const ModalForm = ({visible,onCancel,onAddPayProduct,initialValues={}}) => {
     )
 }
 
+const AdvanceSearchForm = ({onPage}) => {
+    const [expand,setExpand] = useState(false)
+    const [searchForm] = Form.useForm()
+    const getFields = () => {
+        //展开的输入框数量
+        const count = 1;
+        const children = [
+            (
+                <Col span={8} key="productCode">
+                    <Form.Item
+                    name='productCode'
+                    label='支付产品编号'
+                    // rules={[
+                    //     {
+                    //     required: true,
+                    //     message: '请输入支付产品编号!',
+                    //     },
+                    // ]}
+                    >
+                    <Input placeholder="请输入支付产品编号" />
+                    </Form.Item>
+                </Col>
+            ),
+            (
+                <Col span={8} key="productName">
+                    <Form.Item
+                    name='productName'
+                    label='支付产品名称'
+                    // rules={[
+                    //     {
+                    //     required: true,
+                    //     message: '请输入支付产品名称！',
+                    //     },
+                    // ]}
+                    >
+                        <Input placeholder="请输入支付产品名称" />
+                    </Form.Item>
+                </Col>
+            ),
+        ]
+        return expand?children:children.slice(0,count);
+    };
+
+    const onFinish = values =>{
+        onPage(values)
+    }
+
+    return (
+        <Form
+            form={searchForm}
+            name="advanced_search"
+            className="ant-advanced-search-form"
+            onFinish={onFinish}
+            >
+            <Row gutter={24}>{getFields()}</Row>
+            <Row>
+                <Col span={24} style={{ textAlign: 'right' }}>
+                <Button type="primary" htmlType="submit">
+                    搜索
+                </Button>
+                <Button
+                    style={{ margin: '0 8px' }}
+                    htmlType="submit"
+                    onClick={() => {
+                        searchForm.resetFields()
+                    }}
+                >
+                    重置
+                </Button>
+                <a
+                    style={{ fontSize: 12 }}
+                    onClick={() => {
+                        setExpand(!expand);
+                    }}
+                >
+                    {expand ? <UpOutlined /> : <DownOutlined />} {expand?"收起":"展开"}
+                </a>
+                </Col>
+            </Row>
+        </Form>
+    )
+}
+
 export default class PayProduct extends Component{
 
     state = {
@@ -77,6 +162,7 @@ export default class PayProduct extends Component{
             current: 1,
             pageSize: 15
         },
+        condition:{},
         loading: false,
     }
 
@@ -96,44 +182,6 @@ export default class PayProduct extends Component{
             this.payProduct = {}
         }
     }
-
-    getFields = () => {
-        const children = [
-            (
-                <Col span={8} key="productCode">
-                    <Form.Item
-                    name='productCode'
-                    label='支付产品编号'
-                    rules={[
-                        {
-                        required: true,
-                        message: '请输入支付产品编号!',
-                        },
-                    ]}
-                    >
-                    <Input placeholder="请输入支付产品编号" />
-                    </Form.Item>
-                </Col>
-            ),
-            (
-                <Col span={8} key="productName">
-                    <Form.Item
-                    name='productName'
-                    label='支付产品名称'
-                    rules={[
-                        {
-                        required: true,
-                        message: '请输入支付产品名称！',
-                        },
-                    ]}
-                    >
-                        <Input placeholder="请输入支付产品名称" />
-                    </Form.Item>
-                </Col>
-            ),
-        ]
-        return children;
-      };
 
     columns = [
         {
@@ -173,14 +221,12 @@ export default class PayProduct extends Component{
                   <a onClick={()=>{this.setUpdateVisible(true,record)}}>修改</a>
                 </Space>
               ),
-          },
-      ];
-    
-    // data = []
+        },
+    ];
 
-    getPayProductList = async (current,pageSize) =>{
+    getPayProductList = async (current,pageSize,condition) =>{
         this.setState({ loading: true });
-        const result = await reqPayProductList(current,pageSize)
+        const result = await reqPayProductList(current,pageSize,condition)
         this.setState({
             loading: false,
             data:result.data.content,
@@ -192,8 +238,8 @@ export default class PayProduct extends Component{
         })
     }
 
-    handleTableChange = (pagination,filter,sorter)=>{
-        this.getPayProductList(pagination.current,pagination.pageSize)
+    handleTableChange = (pagination,condition)=>{
+        this.getPayProductList(pagination.current,pagination.pageSize,condition)
     }
 
     addPayProduct =  async (productName,productCode,auditStatus) => {
@@ -212,49 +258,20 @@ export default class PayProduct extends Component{
         const { data, pagination, loading } = this.state;
         return (
             <div>
-                <Form
-                    // form={form}
-                    name="advanced_search"
-                    className="ant-advanced-search-form"
-                    // onFinish={onFinish}
-                    >
-                    <Row gutter={24}>{this.getFields()}</Row>
-                    <Row>
-                        <Col span={24} style={{ textAlign: 'right' }}>
-                        <Button type="primary" htmlType="submit">
-                            搜索
-                        </Button>
-                        <Button
-                            style={{ margin: '0 8px' }}
-                            onClick={() => {
-                            // form.resetFields();
-                            }}
-                        >
-                            重置
-                        </Button>
-                        <a
-                            style={{ fontSize: 12 }}
-                            onClick={() => {
-                            // setExpand(!expand);
-                            }}
-                        >
-                           Collapse
-                        </a>
-                        </Col>
-                    </Row>
-                </Form>
-                <Row>
-                    <Col span={24} style={{ textAlign: 'right' }} type="primary">
-                        <Button onClick={()=>this.setAddVisible(true)}>添加</Button>
-                    </Col>
-                </Row>
-                <Table 
+                <AdvanceSearchForm 
+                    onPage={(condition)=>{
+                        this.handleTableChange(pagination,condition)
+                    }}
+                />
+                <Card style={{ marginTop: '16px' }} extra={<Button type="primary" onClick={()=>this.setAddVisible(true)}  shape="round">添加</Button>} >
+                    <Table 
                     columns={this.columns} 
                     dataSource={data} 
                     pagination={pagination}
                     loading={loading}
                     onChange={this.handleTableChange}
                     />
+                </Card>
                 <ModalForm 
                     visible={this.state.addVisible} 
                     onCancel={()=>{this.setAddVisible(false)}} 
