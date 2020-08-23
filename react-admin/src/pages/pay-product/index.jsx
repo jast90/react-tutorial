@@ -7,65 +7,66 @@ import { useState } from 'react';
 
 const { RangePicker } = DatePicker;
 
-const ModalForm = ({visible,onCancel,onAddPayProduct,initialValues={}}) => {
+const ModalForm = ({title,visible,onCancel,onAddPayProduct,initialValues={}}) => {
     const [form] = Form.useForm()
-    
+
     return(
         <Modal
-                title="添加支付产品"
-                centered
-                visible={visible}
-                onOk={() => {
-                    form.validateFields().then(values=>{
-                        console.log(values)
-                        form.resetFields();
-                        onAddPayProduct(values)
-                    })
-                    .catch(info => {
-                        // console.log('验证失败:', info);
-                      });
-                }}
-                onCancel={ ()=>{
-                    onCancel()
+            title={title}
+            centered
+            visible={visible}
+            onOk={() => {
+                form.validateFields().then(values=>{
+                    console.log(values)
                     form.resetFields();
-                }}
-                okText="确定"
-                cancelText="取消"
+                    onAddPayProduct(values)
+                })
+                .catch(info => {
+                    // console.log('验证失败:', info);
+                    });
+            }}
+            onCancel={ ()=>{
+                onCancel()
+                form.resetFields();
+            }}
+            okText="确定"
+            cancelText="取消"
+            >
+            <Form
+                form={form}
+                labelCol={{span:6}}
+                wrapperCol={{span:14}}
+                initialValues={initialValues}
+                preserve={false}
                 >
-                <Form
-                    form={form}
-                    labelCol={{span:6}}
-                    wrapperCol={{span:14}}
-                    initialValues={initialValues}
-                    >
-                    <Form.Item
-                        name="productName"
-                        label="支付产品名称"
-                        rules={[{
-                            required:true,
-                            message:'请输入支付产品名称'
-                        }]}
-                    >
-                        <Input placeholder="支付产品名称"></Input>
-                    </Form.Item>
-                    <Form.Item
-                        name="productCode"
-                        label="支付产品编码"
-                        rules={[{
-                            required:true,
-                            message:'请输入支付产品编码'
-                        }]}
-                    >
-                        <Input placeholder="支付产品编码"></Input>
-                    </Form.Item>
-                    <Form.Item
-                        name="auditStatus"
-                        label="审核状态"
-                    >
-                        <Switch defaultChecked={true}/>
-                    </Form.Item>
-                </Form>
-            </Modal>
+                <Form.Item
+                    name="productName"
+                    label="支付产品名称"
+                    rules={[{
+                        required:true,
+                        message:'请输入支付产品名称'
+                    }]}
+                >
+                    <Input placeholder="支付产品名称"></Input>
+                </Form.Item>
+                <Form.Item
+                    name="productCode"
+                    label="支付产品编码"
+                    rules={[{
+                        required:true,
+                        message:'请输入支付产品编码'
+                    }]}
+                >
+                    <Input placeholder="支付产品编码"></Input>
+                </Form.Item>
+                <Form.Item
+                    name="auditStatus"
+                    label="审核状态"
+                >
+                    <Switch defaultChecked={true}/>
+                </Form.Item>
+            </Form>
+        </Modal>
     )
 }
 
@@ -166,10 +167,6 @@ export default class PayProduct extends Component{
         loading: false,
     }
 
-    setData(data){
-        this.setState({data})
-    }
-
     setAddVisible(addVisible){
         this.setState({addVisible})
     }
@@ -224,22 +221,29 @@ export default class PayProduct extends Component{
         },
     ];
 
-    getPayProductList = async (current,pageSize,condition) =>{
+    getPayProductList = (paginationParam) =>{
         this.setState({ loading: true });
-        const result = await reqPayProductList(current,pageSize,condition)
-        this.setState({
-            loading: false,
-            data:result.data.content,
-            pagination:{
-                current:current,
-                pageSize:pageSize,
-                total:result.data.total
-            }
+        const {condition} = this.state
+        let pagination = paginationParam
+        if(!pagination){
+            pagination = this.state.pagination
+        }
+        const {current,pageSize} = pagination
+        reqPayProductList(current,pageSize,condition).then(result=>{
+            this.setState({
+                loading: false,
+                data:result.data.content,
+                pagination:{
+                    current:current,
+                    pageSize:pageSize,
+                    total:result.data.total
+                }
+            })
         })
     }
 
-    handleTableChange = (pagination,condition)=>{
-        this.getPayProductList(pagination.current,pagination.pageSize,condition)
+    handleTableChange = (pagination)=>{
+        this.getPayProductList(pagination)
     }
 
     addPayProduct =  async (productName,productCode,auditStatus) => {
@@ -248,19 +252,19 @@ export default class PayProduct extends Component{
     }
 
     componentDidMount(){
-        const {pagination} = this.state
-        const {current,pageSize} = pagination
-        this.getPayProductList(current,pageSize)   
+        this.getPayProductList()   
     }
 
 
     render(){
-        const { data, pagination, loading } = this.state;
+        const { data, pagination, loading,condition} = this.state;
         return (
             <div>
                 <AdvanceSearchForm 
                     onPage={(condition)=>{
-                        this.handleTableChange(pagination,condition)
+                        this.setState({condition})
+                        this.setState({pagination:{current:1}})
+                        this.getPayProductList()
                     }}
                 />
                 <Card style={{ marginTop: '16px' }} extra={<Button type="primary" onClick={()=>this.setAddVisible(true)}  shape="round">添加</Button>} >
@@ -273,22 +277,27 @@ export default class PayProduct extends Component{
                     />
                 </Card>
                 <ModalForm 
+                    title="添加支付产品"
                     visible={this.state.addVisible} 
                     onCancel={()=>{this.setAddVisible(false)}} 
                     onAddPayProduct={(values)=>{
-                        const result = this.addPayProduct(values.productName,values.productCode,values.auditStatus)
-                        debugger
-                        if(result.code != 0){
-                            if(result.msg){
-                                message.error(result.msg)
+                        this.addPayProduct(values.productName,values.productCode,values.auditStatus)
+                        .then(data=>{
+                            debugger
+                            console.log(data)
+                            if(data.code != 0){
+                                if(data.msg){
+                                    message.error(data.msg)
+                                }
+                            }else{
+                                this.setAddVisible(false)
+                                this.getPayProductList()
                             }
-                        }else{
-                            this.setAddVisible(false)
-                        }
-                        
+                        })
                     }}
                 />
                 <ModalForm 
+                    title="修改支付产品"
                     visible={this.state.updateVisible} 
                     onCancel={()=>{
                         this.setUpdateVisible(false)
