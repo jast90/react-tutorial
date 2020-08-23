@@ -1,6 +1,12 @@
 import request from './request'
 
 /**
+ * 通用获取分页数据
+ */
+const requestPage = (url,pageNumber=1,pageSize=15,domain) => request(url,{"pageRequest":{pageNumber,pageSize},"domain":domain},"POST")
+
+
+/**
  * 登入
  * @param {} username 
  * @param {*} passowrd 
@@ -43,96 +49,9 @@ export const reqMenuList = ()=>{
 /**
  * 获取订单列表
  */
-export const reqOrderList = () => {
-    let data = [
-        {
-          id: '1',
-          orderNo: '123213123',
-          orderAmount: 20.5,
-          payAmount: 20.5,
-          orderFrom: '小程序',
-        },
-        {
-            id: '2',
-            orderNo: '123213123',
-            orderAmount: 20.5,
-            payAmount: 20.5,
-            orderFrom: '小程序',
-        },
-        {
-            id: '3',
-            orderNo: '123213123',
-            orderAmount: 20.5,
-            payAmount: 20.5,
-            orderFrom: '小程序',
-        },
-        {
-            id: '4',
-            orderNo: '123213123',
-            orderAmount: 20.5,
-            payAmount: 20.5,
-            orderFrom: '小程序',
-        },
-        {
-            id: '5',
-            orderNo: '123213123',
-            orderAmount: 20.5,
-            payAmount: 20.5,
-            orderFrom: '小程序',
-          },
-          {
-              id: '6',
-              orderNo: '123213123',
-              orderAmount: 20.5,
-              payAmount: 20.5,
-              orderFrom: '小程序',
-          },
-          {
-              id: '7',
-              orderNo: '123213123',
-              orderAmount: 20.5,
-              payAmount: 20.5,
-              orderFrom: '小程序',
-          },
-          {
-              id: '8',
-              orderNo: '123213123',
-              orderAmount: 20.5,
-              payAmount: 20.5,
-              orderFrom: '小程序',
-          },
-          {
-            id: '9',
-            orderNo: '123213123',
-            orderAmount: 20.5,
-            payAmount: 20.5,
-            orderFrom: '小程序',
-          },
-          {
-              id: '10',
-              orderNo: '123213123',
-              orderAmount: 20.5,
-              payAmount: 20.5,
-              orderFrom: '小程序',
-          },
-          {
-              id: '11',
-              orderNo: '123213123',
-              orderAmount: 20.5,
-              payAmount: 20.5,
-              orderFrom: '小程序',
-          },
-          {
-              id: '12',
-              orderNo: '123213123',
-              orderAmount: 20.5,
-              payAmount: 20.5,
-              orderFrom: '小程序',
-          },
-      ];
-    return data;
-}
+export const reqOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/order/page",pageNumber,pageSize,domain)
 
-export const reqPayProductList =  (pageNumber=1,pageSize=15,domain) => request("/pay/product/page",{"pageRequest":{pageNumber,pageSize},"domain":domain},"POST")
+export const reqPayProductList =  (pageNumber=1,pageSize=15,domain) => requestPage("/pay/product/page",pageNumber,pageSize,domain)
 
 export const reqAddPayProduct = (productName,productCode,auditStatus)=> request("/pay/product",{productName,productCode,auditStatus},"POST")
+

@@ -1,9 +1,11 @@
-import React,{Component} from 'react'
+import React,{Component,useState} from 'react'
 import { Modal,Form, Row, Col, Input, Button,Table, Space,DatePicker,Switch, message,Card} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
+
 import {reqPayProductList,reqAddPayProduct} from '../../api'
-import { useState } from 'react';
+
+
 
 const { RangePicker } = DatePicker;
 
@@ -75,7 +77,7 @@ const AdvanceSearchForm = ({onPage}) => {
     const [searchForm] = Form.useForm()
     const getFields = () => {
         //展开的输入框数量
-        const count = 1;
+        const count = 6;
         const children = [
             (
                 <Col span={8} key="productCode">
@@ -221,7 +223,7 @@ export default class PayProduct extends Component{
         },
     ];
 
-    getPayProductList = (paginationParam) =>{
+    getPage = (paginationParam) =>{
         this.setState({ loading: true });
         const {condition} = this.state
         let pagination = paginationParam
@@ -243,7 +245,7 @@ export default class PayProduct extends Component{
     }
 
     handleTableChange = (pagination)=>{
-        this.getPayProductList(pagination)
+        this.getPage(pagination)
     }
 
     addPayProduct =  async (productName,productCode,auditStatus) => {
@@ -252,7 +254,7 @@ export default class PayProduct extends Component{
     }
 
     componentDidMount(){
-        this.getPayProductList()   
+        this.getPage()   
     }
 
 
@@ -264,7 +266,7 @@ export default class PayProduct extends Component{
                     onPage={(condition)=>{
                         this.setState({condition})
                         this.setState({pagination:{current:1}})
-                        this.getPayProductList()
+                        this.getPage()
                     }}
                 />
                 <Card style={{ marginTop: '16px' }} extra={<Button type="primary" onClick={()=>this.setAddVisible(true)}  shape="round">添加</Button>} >
@@ -291,7 +293,7 @@ export default class PayProduct extends Component{
                                 }
                             }else{
                                 this.setAddVisible(false)
-                                this.getPayProductList()
+                                this.getPage()
                             }
                         })
                     }}
