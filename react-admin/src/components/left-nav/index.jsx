@@ -36,6 +36,12 @@ export class LeftNav extends Component{
                     }
                 </SubMenu>)
                 pre.push(subMenu)
+                // 计算得到当前请求路径对应的父菜单的key
+                const path = this.props.location.pathname
+                const cItem = menu.children.find((child => child.path===path))
+                if(cItem) {
+                    this.openKey = menu.path
+                }
 
             }else{
                 const menuItem = (
@@ -51,12 +57,21 @@ export class LeftNav extends Component{
         },[])
     }
 
+    componentWillMount() {
+        this.menuNodes = this.getMenuNodes()
+    }
+
     render(){
+        // 当前请求的路径
+        const path = this.props.location.pathname   
         return (
             <div>
                 <div className="logo" />
-                <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline">
-                    {this.getMenuNodes()}
+                <Menu theme="dark" mode="inline"
+                    defaultSelectedKeys={[path]} 
+                    defaultOpenKeys={[this.openKey]}
+                    >
+                    {this.menuNodes}
                 </Menu>
             </div>
         )
