@@ -51,17 +51,33 @@ export const reqMenuList = ()=>{
  */
 export const reqOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/order/page",pageNumber,pageSize,domain)
 
+/**
+ * 分页查询
+ * @param {*} pageNumber 
+ * @param {*} pageSize 
+ * @param {*} domain 
+ */
 export const reqPayProductList =  (pageNumber=1,pageSize=15,domain) => requestPage("/pay/product/page",pageNumber,pageSize,domain)
-
+/**
+ * 添加
+ * @param {*} productName 
+ * @param {*} productCode 
+ * @param {*} auditStatus 
+ */
 export const reqAddPayProduct = (productName,productCode,auditStatus)=> request("/pay/product",{productName,productCode,auditStatus},"POST")
+/**
+ * 修改
+ * @param {*} domain 
+ */
+export const reqUpdatePayProduct = (domain) => request("/pay/product",domain,"PUT")
 
 export const reqAccountPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/page",pageNumber,pageSize,domain)
 
 export const reqAccountHistoryPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/history/page",pageNumber,pageSize,domain)
 
-export const reqAccountPayConfigPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/page/config/page",pageNumber,pageSize,domain)
+export const reqAccountPayConfigPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/pay/config/page",pageNumber,pageSize,domain)
 
-export const reqAccountPayInfoPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/page/info/page",pageNumber,pageSize,domain)
+export const reqAccountPayInfoPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/pay/info/page",pageNumber,pageSize,domain)
 
 export const reqPayWayPage = (pageNumber=1,pageSize=15,domain) => requestPage("/pay/way/page",pageNumber,pageSize,domain)
 

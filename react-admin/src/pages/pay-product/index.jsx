@@ -2,16 +2,13 @@ import React,{Component,useState} from 'react'
 import { Modal,Form, Row, Col, Input, Button,Table, Space,DatePicker,Switch, message,Card} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
+import {reqPayProductList,reqAddPayProduct,reqUpdatePayProduct} from '../../api'
 
-import {reqPayProductList,reqAddPayProduct} from '../../api'
-
-
-
-const { RangePicker } = DatePicker;
-
-const ModalForm = ({title,visible,onCancel,onAddPayProduct,initialValues={}}) => {
+const ModalForm = ({title,visible,onCancel,onOk,initialValues={}}) => {
     const [form] = Form.useForm()
-
+    if(initialValues){
+        form.setFieldsValue(initialValues)
+    }
     return(
         <Modal
             title={title}
@@ -19,13 +16,12 @@ const ModalForm = ({title,visible,onCancel,onAddPayProduct,initialValues={}}) =>
             visible={visible}
             onOk={() => {
                 form.validateFields().then(values=>{
-                    console.log(values)
+                    onOk(values)
                     form.resetFields();
-                    onAddPayProduct(values)
                 })
                 .catch(info => {
                     // console.log('验证失败:', info);
-                    });
+                });
             }}
             onCancel={ ()=>{
                 onCancel()
@@ -33,12 +29,13 @@ const ModalForm = ({title,visible,onCancel,onAddPayProduct,initialValues={}}) =>
             }}
             okText="确定"
             cancelText="取消"
+            forceRender
             >
             <Form
                 form={form}
                 labelCol={{span:6}}
                 wrapperCol={{span:14}}
-                initialValues={initialValues}
+                // initialValues={initialValues}
                 preserve={false}
                 >
                 <Form.Item
@@ -64,8 +61,10 @@ const ModalForm = ({title,visible,onCancel,onAddPayProduct,initialValues={}}) =>
                 <Form.Item
                     name="auditStatus"
                     label="审核状态"
+                    valuePropName="checked"
+                    initialValue={true}
                 >
-                    <Switch defaultChecked={true}/>
+                    <Switch checked/>
                 </Form.Item>
             </Form>
         </Modal>
@@ -167,19 +166,7 @@ export default class PayProduct extends Component{
         },
         condition:{},
         loading: false,
-    }
-
-    setAddVisible(addVisible){
-        this.setState({addVisible})
-    }
-
-    setUpdateVisible(updateVisible,payProduct){
-        this.setState({updateVisible})
-        if(updateVisible){
-            this.payProduct = payProduct
-        }else{
-            this.payProduct = {}
-        }
+        currentPayProduct:{},
     }
 
     columns = [
@@ -205,6 +192,7 @@ export default class PayProduct extends Component{
           title: '审核状态',
           dataIndex: 'auditStatus',
           key: 'auditStatus',
+          render: text => <span>{text?"通过":"未审核"}</span>
         },
         {
           title: '创建时间',
@@ -221,7 +209,22 @@ export default class PayProduct extends Component{
                 </Space>
               ),
         },
-    ];
+    ]
+
+    setAddVisible(addVisible){
+        this.setState({addVisible})
+    }
+
+    setUpdateVisible(updateVisible,payProduct){
+        this.setState({updateVisible})
+        if(updateVisible){
+            this.setState({currentPayProduct:payProduct})
+        }else{
+            this.setState({currentPayProduct:{}})
+        }
+    }
+
+    
 
     getPage = (paginationParam) =>{
         this.setState({ loading: true });
@@ -253,13 +256,26 @@ export default class PayProduct extends Component{
         return result;
     }
 
+    updatePayProduct = (values)=>{
+        const payProduct = this.state.currentPayProduct
+        const {id} = payProduct
+        reqUpdatePayProduct({id,...values}).then((data)=>{
+            if(data.code==0){
+                this.setUpdateVisible(false)
+                this.getPage()
+            }else{
+                message.error(data.msg)
+            }
+        })
+    }
+
     componentDidMount(){
         this.getPage()   
     }
 
 
     render(){
-        const { data, pagination, loading,condition} = this.state;
+        const { data, pagination, loading,condition,currentPayProduct} = this.state;
         return (
             <div>
                 <AdvanceSearchForm 
@@ -276,17 +292,16 @@ export default class PayProduct extends Component{
                     pagination={pagination}
                     loading={loading}
                     onChange={this.handleTableChange}
+                    rowKey="id" 
                     />
                 </Card>
                 <ModalForm 
                     title="添加支付产品"
                     visible={this.state.addVisible} 
                     onCancel={()=>{this.setAddVisible(false)}} 
-                    onAddPayProduct={(values)=>{
+                    onOk={(values)=>{
                         this.addPayProduct(values.productName,values.productCode,values.auditStatus)
                         .then(data=>{
-                            debugger
-                            console.log(data)
                             if(data.code != 0){
                                 if(data.msg){
                                     message.error(data.msg)
@@ -303,12 +318,13 @@ export default class PayProduct extends Component{
                     visible={this.state.updateVisible} 
                     onCancel={()=>{
                         this.setUpdateVisible(false)
-                        this.payProduct = {}
+                        this.setState({currentPayProduct:{}})
                     }} 
-                    onAddPayProduct={()=>{
+                    onOk={(values)=>{
+                        this.updatePayProduct(values)
                         this.setUpdateVisible(false)
                     }}
-                    initialValues={this.payProduct}
+                    initialValues={currentPayProduct}
                 />
             </div>
         )

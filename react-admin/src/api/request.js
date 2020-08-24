@@ -4,11 +4,20 @@ import axios from 'axios'
 export default function request(url,data={},method='GET'){
     return new Promise((resolve,reject)=>{
         let promise
-        if(method==='GET'){
-            promise = axios.get(url,{params:data})
-        }else{
-            promise = axios.post(url,data)
+        switch (method) {
+            case "GET":
+                promise = axios.get(url,{params:data})
+                break;
+            case "POST": 
+                promise = axios.post(url,data)
+                break;
+            case "PUT":
+                promise = axios.put(url,data)
+                break;
+            default:
+                break;
         }
+        
         promise.then(response => {
             resolve(response.data)
         }).catch(error=>{
