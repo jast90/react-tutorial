@@ -2,7 +2,7 @@ import React,{Component,useState} from 'react'
 import { Modal,Form, Row, Col, Input, Button,Table, Space,DatePicker,Switch, message,Card} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
-import {reqPayProductList,reqAddPayProduct,reqUpdatePayProduct} from '../../api'
+import {reqPayProductPage,reqAddPayProduct,reqUpdatePayProduct} from '../../api'
 
 const ModalForm = ({title,visible,onCancel,onOk,initialValues={}}) => {
     const [form] = Form.useForm()
@@ -207,7 +207,7 @@ export default class PayProduct extends Component{
                 <Space size="middle">
                   <a onClick={()=>{this.setUpdateVisible(true,record)}}>修改</a>
                 </Space>
-              ),
+            ),
         },
     ]
 
@@ -234,7 +234,7 @@ export default class PayProduct extends Component{
             pagination = this.state.pagination
         }
         const {current,pageSize} = pagination
-        reqPayProductList(current,pageSize,condition).then(result=>{
+        reqPayProductPage(current,pageSize,condition).then(result=>{
             this.setState({
                 loading: false,
                 data:result.data.content,

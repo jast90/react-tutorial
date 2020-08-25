@@ -57,7 +57,7 @@ export const reqOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/o
  * @param {*} pageSize 
  * @param {*} domain 
  */
-export const reqPayProductList =  (pageNumber=1,pageSize=15,domain) => requestPage("/pay/product/page",pageNumber,pageSize,domain)
+export const reqPayProductPage =  (pageNumber=1,pageSize=15,domain) => requestPage("/pay/product/page",pageNumber,pageSize,domain)
 /**
  * 添加
  * @param {*} productName 
@@ -70,6 +70,7 @@ export const reqAddPayProduct = (productName,productCode,auditStatus)=> request(
  * @param {*} domain 
  */
 export const reqUpdatePayProduct = (domain) => request("/pay/product",domain,"PUT")
+export const reqPayProductList = () => request("/pay/product/list",{},"POST")
 
 export const reqAccountPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/page",pageNumber,pageSize,domain)
 
@@ -80,6 +81,9 @@ export const reqAccountPayConfigPage = (pageNumber=1,pageSize=15,domain) => requ
 export const reqAccountPayInfoPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/pay/info/page",pageNumber,pageSize,domain)
 
 export const reqPayWayPage = (pageNumber=1,pageSize=15,domain) => requestPage("/pay/way/page",pageNumber,pageSize,domain)
+export const reqAddPayWay = (domain) => request("/pay/way",domain,"POST")
+export const reqUpdatePayWay = (domain) => request("/pay/way",domain,"PUT")
+
 
 export const reqProfitSharingOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/profit/sharing/order/page",pageNumber,pageSize,domain)
 

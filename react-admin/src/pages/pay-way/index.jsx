@@ -1,10 +1,11 @@
 import React,{Component,useState} from 'react'
-import { Form, Row, Col, Input, Button,Table, Space,DatePicker,Card} from 'antd';
+import { Form, Row, Col, Input, Button,Table, Space,DatePicker,Card,Modal,Switch, Select,message} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
-import {reqPayWayPage} from '../../api'
+import {reqPayWayPage,reqAddPayWay,reqUpdatePayWay,reqPayProductList} from '../../api'
 
 const { RangePicker } = DatePicker;
+const { Option } = Select;
 
 const AdvanceSearchForm = ({onPage}) => {
     const [expand,setExpand] = useState(false)
@@ -89,7 +90,7 @@ const AdvanceSearchForm = ({onPage}) => {
     )
 }
 
-export default class Account extends Component{
+export default class PayWay extends Component{
     
     state = {
         data: [],
@@ -99,6 +100,10 @@ export default class Account extends Component{
         },
         condition:{},
         loading: false,
+        addVisible: false,
+        updateVisible: false,
+        currentDomain: {},
+        payProductList: []
     }
 
     columns = [
@@ -113,11 +118,6 @@ export default class Account extends Component{
             dataIndex: 'payWayCode',
             key: 'payWayCode',
           //   render: text => <a>{text}</a>,
-          },
-        {
-          title: '支付类型',
-          dataIndex: 'payTypeName',
-          key: 'payTypeName',
         },
         {
           title: '支付产品编号',
@@ -146,18 +146,24 @@ export default class Account extends Component{
           key: 'action',
           render: (text, record) => (
             <Space size="middle">
-              <a>详情</a>
+              <a onClick={()=>{this.setUpdateVisible(true,record)}}>修改</a>
             </Space>
-          ),
+        ),
         },
     ];
 
-
-    
-    componentWillMount(){
-        this.getPage()
+    setAddVisible(addVisible){
+        this.setState({addVisible})
     }
 
+    setUpdateVisible(updateVisible,currentDomain){
+        this.setState({updateVisible})
+        if(updateVisible){
+            this.setState({currentDomain:currentDomain})
+        }else{
+            this.setState({currentDomain:{}})
+        }
+    }
 
     getPage = (paginationParam) =>{
         this.setState({ loading: true });
@@ -180,13 +186,49 @@ export default class Account extends Component{
         })
     }
 
-    handleTableChange = (pagination)=>{
-        this.getPage(pagination)
+    addPayProduct = (values) => {
+        reqAddPayWay(values)
+        .then((data)=>{
+            if(data.code != 0){
+                if(data.msg){
+                    message.error(data.msg)
+                }
+            }else{
+                this.setAddVisible(false)
+                this.getPage()
+            }
+        })
+        
     }
 
+    updatePayProduct = (values)=>{
+        const currentDomain = this.state.currentDomain
+        const {id} = currentDomain
+        reqUpdatePayWay({id,...values}).then((data)=>{
+            if(data.code==0){
+                this.setUpdateVisible(false)
+                this.getPage()
+            }else{
+                message.error(data.msg)
+            }
+        })
+    }
+
+    handleTableChange = (pagination)=>{
+        this.getPage(pagination)
+        
+        
+    }
+
+    componentDidMount(){
+        this.getPage()
+        reqPayProductList().then((data)=>{
+            this.setState({payProductList:data.data})
+        })
+    }
 
     render(){
-        const { data, pagination, loading,condition} = this.state;
+        const { data, pagination, loading,condition,addVisible,updateVisible,currentDomain,payProductList} = this.state;
         return (
             <div>
                 <AdvanceSearchForm 
@@ -196,7 +238,7 @@ export default class Account extends Component{
                         this.getPage()
                     }}
                 />
-                <Card style={{ marginTop: '16px' }} >
+                <Card style={{ marginTop: '16px' }} extra={<Button type="primary" onClick={()=>this.setAddVisible(true)}  shape="round">添加</Button>} >
                     <Table 
                         columns={this.columns} 
                         dataSource={data} 
@@ -205,7 +247,134 @@ export default class Account extends Component{
                         onChange={this.handleTableChange}
                         />
                 </Card>
+                <ModalForm
+                    title="添加支付产品"
+                    visible={addVisible}
+                    onCancel={()=>{
+                        this.setAddVisible(false)
+                    }}
+                    onOk={(values)=>{
+                        this.addPayProduct(values)
+                    }}
+                    payProductList={payProductList}
+                >
+                </ModalForm>
+                <ModalForm
+                    title="更新支付产品"
+                    visible={updateVisible}
+                    onCancel={()=>{
+                        this.setUpdateVisible(false)
+                    }}
+                    onOk={()=>{
+
+                    }}
+                    initialValues={currentDomain}
+                    payProductList={payProductList}
+                >
+                </ModalForm>
             </div>
         )
     }
+}
+
+const ModalForm = ({title,visible,onCancel,onOk,initialValues={},payProductList}) => {
+    const [form] = Form.useForm()
+    if(initialValues){
+        form.setFieldsValue(initialValues)
+    }
+    const getOptions = ()=>{
+        const options = []
+        payProductList.forEach((element,index) => {
+            options.push(<Option value={element.productCode}>{element.productName}</Option>)
+        })
+        return options
+    }
+    return(
+        <Modal
+            title={title}
+            centered
+            visible={visible}
+            onOk={() => {
+                form.validateFields().then(values=>{
+                    onOk(values)
+                    form.resetFields();
+                })
+                .catch(info => {
+                    // console.log('验证失败:', info);
+                });
+            }}
+            onCancel={ ()=>{
+                onCancel()
+                form.resetFields();
+            }}
+            okText="确定"
+            cancelText="取消"
+            forceRender
+            >
+            <Form
+                form={form}
+                labelCol={{span:6}}
+                wrapperCol={{span:14}}
+                // initialValues={initialValues}
+                preserve={false}
+                >
+                <Form.Item
+                    name="payProductCode"
+                    label="支付产品"
+                    rules={[{
+                        required:true,
+                        message:'请选择支付产品'
+                    }]}
+                    initialValue="wechat"
+                >
+                    <Select defaultValue="wechat">
+                        {
+                            getOptions()
+                        }
+                    </Select>
+                </Form.Item>
+                <Form.Item
+                    name="payWayName"
+                    label="支付方式名称"
+                    rules={[{
+                        required:true,
+                        message:'请输入支付方式名称'
+                    }]}
+                >
+                    <Input placeholder="支付方式名称"></Input>
+                </Form.Item>
+                <Form.Item
+                    name="payWayCode"
+                    label="支付方式编码"
+                    rules={[{
+                        required:true,
+                        message:'请输入支付方式编码'
+                    }]}
+                >
+                    <Input placeholder="支付方式编码"></Input>
+                </Form.Item>
+                
+                <Form.Item
+                    name="payRate"
+                    label="商户支付费率"
+                    rules={[{
+                        required:true,
+                        message:'请输入商户支付费率'
+                    }]}
+                >
+                    <Input placeholder="请输入支付方式名称"></Input>
+                </Form.Item>
+                <Form.Item
+                    name="sorts"
+                    label="排序"
+                    rules={[{
+                        required:true,
+                        message:'请输入排序'
+                    }]}
+                >
+                    <Input placeholder="请输入排序"></Input>
+                </Form.Item>
+            </Form>
+        </Modal>
+    )
 }
