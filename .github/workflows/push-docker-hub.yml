@@ -18,7 +18,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_HUB_USER }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-    - name: Build and push cloud user
+    - name: Build and push web-mall
       uses: docker/build-push-action@v2
       with:
         context: ./react-admin
