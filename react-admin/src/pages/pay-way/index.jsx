@@ -260,13 +260,13 @@ export default class PayWay extends Component{
                 >
                 </ModalForm>
                 <ModalForm
-                    title="更新支付产品"
+                    title="修改支付产品"
                     visible={updateVisible}
                     onCancel={()=>{
                         this.setUpdateVisible(false)
                     }}
-                    onOk={()=>{
-
+                    onOk={(values)=>{
+                        this.updatePayProduct(values)
                     }}
                     initialValues={currentDomain}
                     payProductList={payProductList}

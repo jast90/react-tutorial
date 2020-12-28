@@ -94,8 +94,8 @@ export default class Account extends Component{
         },
         {
             title: '支付方式',
-            dataIndex: 'payWayName',
-            key: 'payWayName',
+            dataIndex: 'payWayCode',
+            key: 'payWayCode',
           //   render: text => <a>{text}</a>,
         },
         {
@@ -136,7 +136,7 @@ export default class Account extends Component{
           key: 'action',
           render: (text, record) => (
             <Space size="middle">
-              <a>详情</a>
+              <a>修改</a>
             </Space>
           ),
         },

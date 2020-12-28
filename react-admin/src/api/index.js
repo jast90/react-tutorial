@@ -12,7 +12,7 @@ const requestPage = (url,pageNumber=1,pageSize=15,domain) => request(url,{"pageR
  * @param {*} passowrd 
  */
 export const reqLogin = (username,passowrd)=>{
-    // return request('/login',{username,passowrd},'POST')
+    request("/userinfo")
     return {code:0,data:{id:123,name:"admin"},msg:"用户名密码错误"}
 }
 
@@ -79,8 +79,10 @@ export const reqAccountHistoryPage = (pageNumber=1,pageSize=15,domain) => reques
 export const reqAccountPayConfigPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/pay/config/page",pageNumber,pageSize,domain)
 
 export const reqAccountPayInfoPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/pay/info/page",pageNumber,pageSize,domain)
+export const reqAccountPayInfoAdd = (domain) => request("/account/pay/info",domain,"POST")
 
 export const reqPayWayPage = (pageNumber=1,pageSize=15,domain) => requestPage("/pay/way/page",pageNumber,pageSize,domain)
+export const reqPayWayList = () => request("/pay/way/list",{},"POST")
 export const reqAddPayWay = (domain) => request("/pay/way",domain,"POST")
 export const reqUpdatePayWay = (domain) => request("/pay/way",domain,"PUT")
 
