@@ -43,6 +43,7 @@ export const reqMenuList = ()=>{
         ]},
         {path:"/red/pack/order",title:"红包订单",icon:"<PieChartOutlined />"},
         {path:"/transfer/order",title:"转账订单",icon:"<PieChartOutlined />"},
+        {path:"/store/goods",title:"门店商品",icon:"<PieChartOutlined />"},
     ]
 }
 
