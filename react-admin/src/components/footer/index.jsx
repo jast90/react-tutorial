@@ -4,7 +4,7 @@ export default class MyFooter extends Component{
 
     render(){
         return (
-            <div>支付管理后台</div>
+            <div>商城商家后台</div>
         )
     }
 

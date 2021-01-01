@@ -20,7 +20,9 @@ import ProfitSharingReceiver from '../profit-sharing-receiver'
 import ProfitSharingReturnOrder from '../profit-sharing-return-order'
 import RedPackOrder from '../red-pack-order'
 import TransferOrder from '../transfer-order'
+import Store from '../store'
 import StoreGoods from '../store-goods'
+import StoreGoodsAdd from '../store-goods_add'
 
 const { Header, Footer, Sider, Content } = Layout;
 
@@ -64,7 +66,9 @@ export default class Admin extends Component{
                                 <Route path='/profit/sharing/return/order' component={ProfitSharingReturnOrder}/>
                                 <Route path='/red/pack/order' component={RedPackOrder}/>
                                 <Route path='/transfer/order' component={TransferOrder}/>
+                                <Route path='/store/goods/add' component={StoreGoodsAdd}/>
                                 <Route path='/store/goods' component={StoreGoods}/>
+                                <Route path='/store' component={Store}/>
                             </Switch>
                         </Content>
                         <Footer><MyFooter /></Footer>

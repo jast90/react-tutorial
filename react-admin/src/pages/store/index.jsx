@@ -1,9 +1,9 @@
 import React,{Component,useState} from 'react'
-import { Modal,Form, Row, Col,Select, Input, Button,Table, Space,DatePicker,Switch, message,Card} from 'antd';
+import { Select,Form, Row, Col, Input, Button,Table, Space,DatePicker,Card} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
-import {reqStoreGoodsPage} from '../../api'
-
+import SearchTabl from "../../components/search-table";
+import {reqStorePage} from '../../api'
 
 const { RangePicker } = DatePicker;
 const {Option} = Select
@@ -16,10 +16,10 @@ const AdvanceSearchForm = ({onPage}) => {
         const count = 6;
         const children = [
             (
-                <Col span={8} key="goodsNo">
+                <Col span={8} key="orderNo">
                     <Form.Item
-                    name='goodsNo'
-                    label='商品编号'
+                    name='storeName'
+                    label='门店名称'
                     // rules={[
                     //     {
                     //     required: true,
@@ -27,15 +27,15 @@ const AdvanceSearchForm = ({onPage}) => {
                     //     },
                     // ]}
                     >
-                    <Input placeholder="请输入商品编号" />
+                    <Input placeholder="请输入门店名称" />
                     </Form.Item>
                 </Col>
             ),
             (
-                <Col span={8} key="name">
+                <Col span={8} key="orderNo">
                     <Form.Item
-                    name='name'
-                    label='商品名称'
+                    name='address'
+                    label='门店地址'
                     // rules={[
                     //     {
                     //     required: true,
@@ -43,7 +43,7 @@ const AdvanceSearchForm = ({onPage}) => {
                     //     },
                     // ]}
                     >
-                    <Input placeholder="请输入商品名称" />
+                    <Input placeholder="请输入门店地址" />
                     </Form.Item>
                 </Col>
             ),
@@ -92,11 +92,9 @@ const AdvanceSearchForm = ({onPage}) => {
     )
 }
 
-export default class StoreGoods extends Component{
+export default class Account extends Component{
     
     state = {
-        addVisible: false,
-        updateVisible: false,
         data: [],
         pagination:{
             current: 1,
@@ -104,28 +102,42 @@ export default class StoreGoods extends Component{
         },
         condition:{},
         loading: false,
-        detail:""
     }
 
     columns = [
         {
           title: '编号',
-          dataIndex: 'goodsNo',
-          key: 'goodsNo',
+          dataIndex: 'storeId',
+          key: 'storeId',
         //   render: text => <a>{text}</a>,
         },
         {
-            title: '名称',
-            dataIndex: 'name',
-            key: 'name',
+            title: '门店名称',
+            dataIndex: 'storeName',
+            key: 'storeName',
           //   render: text => <a>{text}</a>,
+        },
+        {
+          title: '门店地址',
+          dataIndex: 'address',
+          key: 'address',
+        },
+        {
+          title: '经度',
+          dataIndex: 'longitude',
+          key: 'longitude',
+        },
+        {
+            title: '纬度',
+            dataIndex: 'latitude',
+            key: 'latitude',
         },
         {
           title: '操作',
           key: 'action',
           render: (text, record) => (
             <Space size="middle">
-              <a>修改</a>
+              <a href="/store/goods">商品</a>
             </Space>
           ),
         },
@@ -137,9 +149,6 @@ export default class StoreGoods extends Component{
         this.getPage()
     }
 
-    setAddVisible(addVisible){
-        this.setState({addVisible})
-    }
 
     getPage = (paginationParam) =>{
         this.setState({ loading: true });
@@ -149,7 +158,7 @@ export default class StoreGoods extends Component{
             pagination = this.state.pagination
         }
         const {current,pageSize} = pagination
-        reqStoreGoodsPage(current,pageSize,condition).then(result=>{
+        reqStorePage(current,pageSize,condition).then(result=>{
             this.setState({
                 loading: false,
                 data:result.data.content,
@@ -165,7 +174,6 @@ export default class StoreGoods extends Component{
     handleTableChange = (pagination)=>{
         this.getPage(pagination)
     }
-
 
     render(){
         const { data, pagination, loading,condition} = this.state;

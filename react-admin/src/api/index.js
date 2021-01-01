@@ -41,9 +41,13 @@ export const reqMenuList = ()=>{
             {path:"/profit/sharing/receiver",title:"分账接收方",icon:"<PieChartOutlined />"},
             {path:"/profit/sharing/return/order",title:"分账退回订单",icon:"<PieChartOutlined />"},
         ]},
-        {path:"/red/pack/order",title:"红包订单",icon:"<PieChartOutlined />"},
-        {path:"/transfer/order",title:"转账订单",icon:"<PieChartOutlined />"},
-        {path:"/store/goods",title:"门店商品",icon:"<PieChartOutlined />"},
+        {path:"/red/pack/order",title:"红包订单",icon:"<PieChartOutlined />"}
+        ,{path:"/transfer/order",title:"转账订单",icon:"<PieChartOutlined />"}
+        ,{path:"/store/goods",title:"商品",icon:"<PieChartOutlined />",children:[
+            {path:"/store/goods",title:"商品列表",icon:"<PieChartOutlined />"},
+            {path:"/store/goods/add",title:"发布商品",icon:"<PieChartOutlined />"}
+        ]}
+        ,{path:"/store",title:"门店列表",icon:"<PieChartOutlined />"}
     ]
 }
 
@@ -98,3 +102,8 @@ export const reqRedPackOrderPage = (pageNumber=1,pageSize=15,domain) => requestP
 
 export const reqTransferOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/transfer/order/page",pageNumber,pageSize,domain)
 
+export const reqStorePage = (pageNumber=1,pageSize=15,domain) => requestPage("/store/page",pageNumber,pageSize,domain)
+
+export const reqStoreGoodsPage = (pageNumber=1,pageSize=15,domain) => requestPage("/store/goods/page",pageNumber,pageSize,domain)
+
+export const reqStoreGoodsAdd = (domain) => request("/store/goods",domain,"POST")
