@@ -1,10 +1,11 @@
 import request from './request'
 
+export const uploadURL="/oss/upload/jastz"
+
 /**
  * 通用获取分页数据
  */
 const requestPage = (url,pageNumber=1,pageSize=15,domain) => request(url,{"pageRequest":{pageNumber,pageSize},"domain":domain},"POST")
-
 
 /**
  * 登入
