@@ -1,4 +1,5 @@
 import request from './request'
+import qs from 'qs'
 
 export const uploadURL="/oss/upload/jastz"
 
@@ -12,9 +13,16 @@ const requestPage = (url,pageNumber=1,pageSize=15,domain) => request(url,{"pageR
  * @param {} username 
  * @param {*} passowrd 
  */
-export const reqLogin = (username,passowrd)=>{
-    request("/userinfo")
-    return {code:0,data:{id:123,name:"admin"},msg:"用户名密码错误"}
+export const reqLogin = (username,password)=>{
+    const headers ={
+        'Content-Type': 'application/x-www-form-urlencoded'
+    }
+    const loginInfo = {
+        "username":username,
+        "password":password,
+        "grant_type":"password"
+    }
+    return request("/oauth2/oauth/token",qs.stringify(loginInfo),"POST",headers,{username:"gateway",password:"123456"})
 }
 
 

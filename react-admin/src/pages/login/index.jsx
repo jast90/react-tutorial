@@ -10,16 +10,16 @@ import storageUtils from '../../utils/storageUtils'
 
 export class Login extends Component{
 
-    login = async (username,password)=>{
-        console.log(username,password)
+    login = async (param)=>{
+        console.log(param)
+        const {username,password} = param
         const result = await reqLogin(username,password)
-        if(result.code === 0){
-            const user = result.data
-            storageUtils.saveUser(user)
+        console.log(result)
+        if(result){
+            storageUtils.saveUser(result)
             this.props.history.replace('/')
-        }else{
-            message.error(result.msg)
         }
+    
     }
 
     render(){

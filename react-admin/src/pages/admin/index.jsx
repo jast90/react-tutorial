@@ -38,6 +38,7 @@ export default class Admin extends Component{
 
     render(){
         const user = storageUtils.getUser()
+        console.log(user)
         if(!user){
             return <Redirect to='/login'/>
         }

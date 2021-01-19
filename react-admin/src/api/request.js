@@ -1,22 +1,29 @@
 import {message} from 'antd'
 import axios from 'axios'
 
-export default function request(url,data={},method='GET'){
+export default function request(url,data={},method='GET',headers={},auth={}){
     return new Promise((resolve,reject)=>{
-        let promise
-        switch (method) {
-            case "GET":
-                promise = axios.get(url,{params:data})
-                break;
-            case "POST": 
-                promise = axios.post(url,data)
-                break;
-            case "PUT":
-                promise = axios.put(url,data)
-                break;
-            default:
-                break;
-        }
+        let promise = axios({
+            headers:headers,
+            method:method,
+            url:url,
+            auth:auth,
+            data:data
+        })
+
+        // switch (method) {
+        //     case "GET":
+        //         promise = axios.get(url,{params:data},config)
+        //         break;
+        //     case "POST": 
+        //         promise = axios.post(url,data,config)
+        //         break;
+        //     case "PUT":
+        //         promise = axios.put(url,data,config)
+        //         break;
+        //     default:
+        //         break;
+        // }
         
         promise.then(response => {
             resolve(response.data)
