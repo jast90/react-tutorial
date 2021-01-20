@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import {Redirect, withRouter} from 'react-router-dom'
 
 import './login.css'
-import {reqLogin} from '../../api'
+import {reqLogin,reqAuthorities} from '../../api'
 import storageUtils from '../../utils/storageUtils'
 
 export class Login extends Component{
@@ -14,9 +14,12 @@ export class Login extends Component{
         console.log(param)
         const {username,password} = param
         const result = await reqLogin(username,password)
-        console.log(result)
         if(result){
             storageUtils.saveUser(result)
+            //登入成功后权限
+            const authorities = await reqAuthorities()
+            console.log(authorities)
+            storageUtils.saveUserAuthorities(authorities)
             this.props.history.replace('/')
         }
     

@@ -24,7 +24,12 @@ export const reqLogin = (username,password)=>{
     }
     return request("/oauth2/oauth/token",qs.stringify(loginInfo),"POST",headers,{username:"gateway",password:"123456"})
 }
-
+/**
+ * 获取用户权限
+ */
+export const reqAuthorities = ()=>{
+    return request("/oauth2/authorities")
+}
 
 export const reqMenuList = ()=>{
     return [
