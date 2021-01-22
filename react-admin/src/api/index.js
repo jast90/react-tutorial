@@ -68,7 +68,7 @@ export const reqMenuList = ()=>{
 /**
  * 获取订单列表
  */
-export const reqOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/order/page",pageNumber,pageSize,domain)
+export const reqOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/order/page",pageNumber,pageSize,domain)
 
 /**
  * 分页查询
@@ -76,48 +76,48 @@ export const reqOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/o
  * @param {*} pageSize 
  * @param {*} domain 
  */
-export const reqPayProductPage =  (pageNumber=1,pageSize=15,domain) => requestPage("/pay/product/page",pageNumber,pageSize,domain)
+export const reqPayProductPage =  (pageNumber=1,pageSize=15,domain) => requestPage("/payment/pay/product/page",pageNumber,pageSize,domain)
 /**
  * 添加
  * @param {*} productName 
  * @param {*} productCode 
  * @param {*} auditStatus 
  */
-export const reqAddPayProduct = (productName,productCode,auditStatus)=> request("/pay/product",{productName,productCode,auditStatus},"POST")
+export const reqAddPayProduct = (productName,productCode,auditStatus)=> request("/payment/pay/product",{productName,productCode,auditStatus},"POST")
 /**
  * 修改
  * @param {*} domain 
  */
-export const reqUpdatePayProduct = (domain) => request("/pay/product",domain,"PUT")
+export const reqUpdatePayProduct = (domain) => request("/payment/pay/product",domain,"PUT")
 export const reqPayProductList = () => request("/pay/product/list",{},"POST")
 
-export const reqAccountPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/page",pageNumber,pageSize,domain)
+export const reqAccountPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/account/page",pageNumber,pageSize,domain)
 
-export const reqAccountHistoryPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/history/page",pageNumber,pageSize,domain)
+export const reqAccountHistoryPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/account/history/page",pageNumber,pageSize,domain)
 
-export const reqAccountPayConfigPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/pay/config/page",pageNumber,pageSize,domain)
+export const reqAccountPayConfigPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/account/pay/config/page",pageNumber,pageSize,domain)
 
-export const reqAccountPayInfoPage = (pageNumber=1,pageSize=15,domain) => requestPage("/account/pay/info/page",pageNumber,pageSize,domain)
-export const reqAccountPayInfoAdd = (domain) => request("/account/pay/info",domain,"POST")
+export const reqAccountPayInfoPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/account/pay/info/page",pageNumber,pageSize,domain)
+export const reqAccountPayInfoAdd = (domain) => request("/payment/account/pay/info",domain,"POST")
 
-export const reqPayWayPage = (pageNumber=1,pageSize=15,domain) => requestPage("/pay/way/page",pageNumber,pageSize,domain)
-export const reqPayWayList = () => request("/pay/way/list",{},"POST")
-export const reqAddPayWay = (domain) => request("/pay/way",domain,"POST")
-export const reqUpdatePayWay = (domain) => request("/pay/way",domain,"PUT")
+export const reqPayWayPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/pay/way/page",pageNumber,pageSize,domain)
+export const reqPayWayList = () => request("/payment/pay/way/list",{},"POST")
+export const reqAddPayWay = (domain) => request("/payment/pay/way",domain,"POST")
+export const reqUpdatePayWay = (domain) => request("/payment/pay/way",domain,"PUT")
 
 
-export const reqProfitSharingOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/profit/sharing/order/page",pageNumber,pageSize,domain)
+export const reqProfitSharingOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/profit/sharing/order/page",pageNumber,pageSize,domain)
 
-export const reqProfitSharingReceiverPage = (pageNumber=1,pageSize=15,domain) => requestPage("/profit/sharing/receiver/page",pageNumber,pageSize,domain)
+export const reqProfitSharingReceiverPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/profit/sharing/receiver/page",pageNumber,pageSize,domain)
 
-export const reqProfitSharingReturnOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/profit/sharing/return/order/page",pageNumber,pageSize,domain)
+export const reqProfitSharingReturnOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/profit/sharing/return/order/page",pageNumber,pageSize,domain)
 
-export const reqRedPackOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/red/pack/order/page",pageNumber,pageSize,domain)
+export const reqRedPackOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/red/pack/order/page",pageNumber,pageSize,domain)
 
-export const reqTransferOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/transfer/order/page",pageNumber,pageSize,domain)
+export const reqTransferOrderPage = (pageNumber=1,pageSize=15,domain) => requestPage("/payment/transfer/order/page",pageNumber,pageSize,domain)
 
-export const reqStorePage = (pageNumber=1,pageSize=15,domain) => requestPage("/store/page",pageNumber,pageSize,domain)
+export const reqStorePage = (pageNumber=1,pageSize=15,domain) => requestPage("/store/store/page",pageNumber,pageSize,domain)
 
-export const reqStoreGoodsPage = (pageNumber=1,pageSize=15,domain) => requestPage("/store/goods/page",pageNumber,pageSize,domain)
+export const reqStoreGoodsPage = (pageNumber=1,pageSize=15,domain) => requestPage("/store/store/goods/page",pageNumber,pageSize,domain)
 
-export const reqStoreGoodsAdd = (domain) => request("/store/goods",domain,"POST")
+export const reqStoreGoodsAdd = (domain) => request("/store/store/goods",domain,"POST")
