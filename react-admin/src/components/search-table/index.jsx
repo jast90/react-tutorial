@@ -1,48 +1,36 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import { Select,Form, Row, Col, Input, Button,Table, Space,DatePicker,Card} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
-const MyForm = ({formFields,onSearch}) => {
+const AdvanceSearchForm = ({onPage}) => {
     const [expand,setExpand] = useState(false)
     const [searchForm] = Form.useForm()
-    
-    React.useEffect(()=>{
-        console.log("MyForm mount");
-        return ()=>{
-            console.log("MyForm unmount")
-        }
-    },[])
-
     const getFields = () => {
         //展开的输入框数量
         const count = 6;
         const children = [
             (
-                <Col span={8} key="orderNo">
+                <Col span={8} key="accountNo">
                     <Form.Item
-                    name='orderNo'
-                    label='订单号'
+                    name='userName'
+                    label='用户名'
                     // rules={[
                     //     {
                     //     required: true,
-                    //     message: '请输入订单号!',
+                    //     message: '请输入用户名!',
                     //     },
                     // ]}
                     >
-                    <Input placeholder="请输入订单号" />
+                    <Input placeholder="请输入用户名" />
                     </Form.Item>
                 </Col>
-            )
+            ),
         ]
-        if(formFields){
-            return expand?formFields:formFields.slice(0,count);
-        }
         return expand?children:children.slice(0,count);
     }
 
     const onFinish = values =>{
-        console.log(values)
-        onSearch(values)
+        onPage(values)
     }
 
     return (
@@ -81,32 +69,28 @@ const MyForm = ({formFields,onSearch}) => {
     )
 }
 
-const MyTable = ({columns,reqPage,paginationParam})=>{
-
-    React.useEffect(()=>{
-        console.log("MyTable mount");
+const SearchTable = (props) =>{
+    const [data,setData] = useState([])
+    const [pagination,setPagination] = useState({current: 1,pageSize: 15})
+    const [condition,setCondition] = useState({})
+    const [loading,setLoading] = useState(false)
+    useEffect(() => {
         getPage()
-        return ()=>{
-            console.log("MyTable unmount")
-        }
-    },[])
+      }, [])
 
-    const [data,setData] = React.useState([])
-    const [loading,setLoading] = React.useState(false)
-    const [pagination,setPagination] = React.useState({current: 1,pageSize: 1})
-    const [condition,setCondition] = React.useState({})
+    const columns = props.columns
 
-    const getPage = () =>{
+
+    const getPage = (paginationParam) =>{
+        console.log("getPage")
         setLoading(true)
-        if(paginationParam){
-            setPagination({
-                current:paginationParam.current,
-                pageSize:paginationParam.pageSize,
-            })
-            setCondition(paginationParam.condition)
+        let myPagination = paginationParam
+        if(!myPagination){
+            myPagination = pagination
         }
-        const {current,pageSize} = pagination
-        reqPage(current,pageSize,condition).then(result=>{
+        const {current,pageSize} = myPagination
+        
+        props.onPage(current,pageSize,condition).then(result=>{
             setLoading(false)
             setData(result.data.content)
             setPagination({
@@ -117,32 +101,36 @@ const MyTable = ({columns,reqPage,paginationParam})=>{
         })
     }
 
-    return (
-        <Card style={{ marginTop: '16px' }} >
-            <Table 
-                columns={columns} 
-                loading={loading}
-                pagination={pagination}
-                dataSource={data}
-                onChange={getPage}
-                />
-        </Card>
-    )
-}
+    const handleTableChange = (values)=>{
+        getPage(values)
+    }
 
-export default function SearchTabl({formFields,columns,reqPage,paginationParam}){
 
     return (
         <div>
-            <MyForm 
-                formFields={formFields}
-                onSearch={reqPage}
-                />
-            <MyTable 
-                columns={columns}
-                reqPage={reqPage}
-                paginationParam={paginationParam}
+            <AdvanceSearchForm 
+                onPage={(values)=>{
+                    setCondition({values})
+                    setPagination({current: 1})
+                    const {total,pageSize} = pagination
+                    getPage({
+                        current: 1,
+                        pageSize: pageSize,
+                        total: total
+                    })
+                }}
             />
+            <Card style={{ marginTop: '16px' }} extra={<Button type="primary" onClick={()=>this.setAddVisible(true)}  shape="round">添加</Button>}>
+                <Table 
+                    columns={columns} 
+                    dataSource={data} 
+                    pagination={pagination}
+                    loading={loading}
+                    onChange={handleTableChange}
+                    />
+            </Card>
         </div>
-    );
+    )
 }
+
+export default SearchTable

@@ -62,6 +62,10 @@ export const reqMenuList = ()=>{
             {path:"/store/goods/add",title:"发布商品",icon:"<PieChartOutlined />"}
         ]}
         ,{path:"/store",title:"门店列表",icon:"<PieChartOutlined />"}
+        ,{path:"/user",title:"用户",icon:"<PieChartOutlined />",children:[
+            {path:"/user/page",title:"用户列表",icon:"<PieChartOutlined />"},
+            {path:"/user/add",title:"添加用户",icon:"<PieChartOutlined />"},
+        ]}
     ]
 }
 
@@ -121,3 +125,8 @@ export const reqStorePage = (pageNumber=1,pageSize=15,domain) => requestPage("/s
 export const reqStoreGoodsPage = (pageNumber=1,pageSize=15,domain) => requestPage("/store/store/goods/page",pageNumber,pageSize,domain)
 
 export const reqStoreGoodsAdd = (domain) => request("/store/store/goods",domain,"POST")
+
+
+export const reqUserPage = (pageNumber=1,pageSize=15,domain) => requestPage("/user/user/page",pageNumber,pageSize,domain)
+
+export const reqUserAdd = (domain) => request("/user/user",domain,"POST")
