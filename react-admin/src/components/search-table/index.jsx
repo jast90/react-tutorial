@@ -1,68 +1,31 @@
 import React,{useState,useEffect} from 'react'
-import { Form, Row, Col, Button,Table,Card,Modal,Select,Input} from 'antd';
+import { Form, Row, Col, Button,Table,Card,Modal,Select,Space} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 const { Option } = Select;
-
-const AdvanceSearchForm = (props) => {
-    const [expand,setExpand] = useState(false)
-    const [searchForm] = Form.useForm()
-    const getFields = () => {
-        //展开的输入框数量
-        const count = 6;
-        const children = props.formFields
-        return expand?children:children.slice(0,count);
-    }
-
-    const onFinish = values =>{
-        props.onPage(values)
-    }
-
-    return (
-        <Form
-            form={searchForm}
-            name="advanced_search"
-            className="ant-advanced-search-form"
-            onFinish={onFinish}
-            >
-            <Row gutter={24}>{getFields()}</Row>
-            <Row>
-                <Col span={24} style={{ textAlign: 'right' }}>
-                <Button type="primary" htmlType="submit">
-                    搜索
-                </Button>
-                <Button
-                    style={{ margin: '0 8px' }}
-                    htmlType="submit"
-                    onClick={() => {
-                        searchForm.resetFields()
-                    }}
-                >
-                    重置
-                </Button>
-                <a
-                    style={{ fontSize: 12 }}
-                    onClick={() => {
-                        setExpand(!expand);
-                    }}
-                >
-                    {expand ? <UpOutlined /> : <DownOutlined />} {expand?"收起":"展开"}
-                </a>
-                </Col>
-            </Row>
-        </Form>
-    )
-}
+const { Column, ColumnGroup } = Table;
 
 const SearchTable = (props) =>{
+    const [expand,setExpand] = useState(false)
+    const [searchForm] = Form.useForm()
+    const [addForm] = Form.useForm()
+    const [updateForm] = Form.useForm()
 
     //查询table的props
     const columns = props.columns
     const searchFormFields = props.searchFormFields
     const requestPage = props.requestPage
+    const requestUpdate = props.requestUpdate
+    const initValue = props.initValue
 
     //添加弹窗的props
-    const addFormFields = props.addFormFields
+    const editFormFields = props.addFormFields
     const requestAdd = props.requestAdd
+
+    const addModalShow = props.addModalShow
+    const updateModalShow = props.updateModalShow
+    const onShowAddModal = props.onShowAddModal
+    const onHideAddModal = props.onHideAddModal
+    const onHideUpdateModal = props.onHideUpdateModal
 
     //查询table的状态
     const [data,setData] = useState([])
@@ -70,9 +33,9 @@ const SearchTable = (props) =>{
     const [condition,setCondition] = useState({})
     const [loading,setLoading] = useState(false)
 
-    //添加弹窗的状态
-    const [addModalShow,setAddModalShow] = useState(false)
-
+    if(initValue){
+        updateForm.setFieldsValue(initValue)
+    }
 
     useEffect(() => {
         getPage()
@@ -97,28 +60,58 @@ const SearchTable = (props) =>{
         })
     }
 
-    const handleTableChange = (values)=>{
+    const handleTableChange = (values) => {
         getPage(values)
+    }
+
+    const onSearch = (values) => {
+        setCondition({values})
+        const {total,pageSize} = pagination
+        getPage({
+            current: 1,
+            pageSize: pageSize,
+            total: total
+        })
     }
 
 
     return (
         <div>
-            <AdvanceSearchForm 
-                onPage={(values)=>{
-                    setCondition({values})
-                    const {total,pageSize} = pagination
-                    getPage({
-                        current: 1,
-                        pageSize: pageSize,
-                        total: total
-                    })
-                }}
-                formFields={searchFormFields}
-            />
+            <Form
+                form={searchForm}
+                name="advanced_search"
+                className="ant-advanced-search-form"
+                onFinish={onSearch}
+                >
+                <Row gutter={24}>{searchFormFields}</Row>
+                <Row>
+                    <Col span={24} style={{ textAlign: 'right' }}>
+                    <Button type="primary" htmlType="submit">
+                        搜索
+                    </Button>
+                    <Button
+                        style={{ margin: '0 8px' }}
+                        htmlType="submit"
+                        onClick={() => {
+                            searchForm.resetFields()
+                        }}
+                    >
+                        重置
+                    </Button>
+                    <a
+                        style={{ fontSize: 12 }}
+                        onClick={() => {
+                            setExpand(!expand);
+                        }}
+                    >
+                        {expand ? <UpOutlined /> : <DownOutlined />} {expand?"收起":"展开"}
+                    </a>
+                    </Col>
+                </Row>
+            </Form>
             <Card style={{ marginTop: '16px' }} 
                 extra={
-                    <Button type="primary" onClick={()=>setAddModalShow(true)}  shape="round">添加</Button>}
+                    <Button type="primary" onClick={onShowAddModal}  shape="round">添加</Button>}
                 >
                 <Table 
                     columns={columns} 
@@ -128,107 +121,93 @@ const SearchTable = (props) =>{
                     onChange={handleTableChange}
                     />
             </Card>
-            <AddModalForm 
+            <Modal
                 title="添加"
-                show={addModalShow}
-                onCancel={()=>{
-                    setAddModalShow(false)
-                }}
-                onOk={(values)=>{
-                    requestAdd(values).then(result => {
-                        if(result.code === 0){
-                            setAddModalShow(false)
-                            const {total,pageSize} = pagination
-                            getPage({
-                                current: 1,
-                                pageSize: pageSize,
-                                total: total
-                            })
-                        }
+                centered
+                visible={addModalShow}
+                onOk={() => {
+                    addForm.validateFields().then(values=>{
+                        addForm.resetFields();
+                        requestAdd(values).then(result => {
+                            if(result.code === 0){
+                                onHideAddModal()
+                                const {total,pageSize} = pagination
+                                getPage({
+                                    current: 1,
+                                    pageSize: pageSize,
+                                    total: total
+                                })
+                            }
+                        })
                     })
+                    .catch(info => {
+                        // console.log('验证失败:', info);
+                    });
                 }}
-                formItems={addFormFields}
-                
-            />
+                onCancel={ ()=>{
+                    addForm.resetFields();
+                    onHideAddModal()
+                }}
+                okText="确定"
+                cancelText="取消"
+                forceRender
+                >
+                <Form
+                    form={addForm}
+                    labelCol={{span:6}}
+                    wrapperCol={{span:14}}
+                    // initialValues={initialValues}
+                    preserve={false}
+                    >
+                    {editFormFields}
+                </Form>
+            </Modal>
+            <Modal
+                title="修改"
+                centered
+                visible={updateModalShow}
+                onOk={() => {
+                    updateForm.validateFields().then(values=>{
+                        requestUpdate(values).then(result => {
+                            if(result.code === 0){
+                                onHideUpdateModal()
+                                updateForm.resetFields();
+                                const {total,pageSize} = pagination
+                                getPage({
+                                    current: 1,
+                                    pageSize: pageSize,
+                                    total: total
+                                })
+
+                            }
+                        })
+                        
+                    })
+                    .catch(info => {
+                        // console.log('验证失败:', info);
+                    });
+                }}
+                onCancel={ ()=>{
+                    updateForm.resetFields();
+                    onHideUpdateModal()
+                }}
+                okText="确定"
+                cancelText="取消"
+                forceRender
+                >
+                <Form
+                    form={updateForm}
+                    labelCol={{span:6}}
+                    wrapperCol={{span:14}}
+                    // initialValues={initValue}
+                    preserve={false}
+                    >
+                    {editFormFields}
+                </Form>
+            </Modal>
         </div>
     )
 }
 
-const AddModalForm = ({title,show,onCancel,onOk,formItems,reload}) => {
-    const [form] = Form.useForm()
-
-    return(
-        <Modal
-            title={title}
-            centered
-            visible={show}
-            onOk={() => {
-                form.validateFields().then(values=>{
-                    onOk(values)
-                    form.resetFields();
-                })
-                .catch(info => {
-                    // console.log('验证失败:', info);
-                });
-            }}
-            onCancel={ ()=>{
-                onCancel()
-                form.resetFields();
-            }}
-            okText="确定"
-            cancelText="取消"
-            forceRender
-            >
-            <Form
-                form={form}
-                labelCol={{span:6}}
-                wrapperCol={{span:14}}
-                // initialValues={initialValues}
-                preserve={false}
-                >
-                {formItems}
-            </Form>
-        </Modal>
-    )
-}
-
-
-const UpdateModalForm = ({title,show,onCancel,onOk,formItems,reload}) => {
-    const [form] = Form.useForm()
-
-    return(
-        <Modal
-            title={title}
-            centered
-            visible={show}
-            onOk={() => {
-                form.validateFields().then(values=>{
-                    onOk(values)
-                    form.resetFields();
-                })
-                .catch(info => {
-                    // console.log('验证失败:', info);
-                });
-            }}
-            onCancel={ ()=>{
-                onCancel()
-                form.resetFields();
-            }}
-            okText="确定"
-            cancelText="取消"
-            forceRender
-            >
-            <Form
-                form={form}
-                labelCol={{span:6}}
-                wrapperCol={{span:14}}
-                // initialValues={initialValues}
-                preserve={false}
-                >
-                {formItems}
-            </Form>
-        </Modal>
-    )
-}
 
 export default SearchTable

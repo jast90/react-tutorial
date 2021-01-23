@@ -64,6 +64,7 @@ export const reqMenuList = ()=>{
         ,{path:"/store",title:"门店列表",icon:"<PieChartOutlined />"}
         ,{path:"/user",title:"用户",icon:"<PieChartOutlined />",children:[
             {path:"/user/page",title:"用户列表",icon:"<PieChartOutlined />"},
+            {path:"/role/page",title:"角色列表",icon:"<PieChartOutlined />"},
         ]}
     ]
 }
@@ -129,3 +130,9 @@ export const reqStoreGoodsAdd = (domain) => request("/store/store/goods",domain,
 export const reqUserPage = (pageNumber=1,pageSize=15,domain) => requestPage("/user/user/page",pageNumber,pageSize,domain)
 
 export const reqUserAdd = (domain) => request("/user/user",domain,"POST")
+
+
+export const reqRolePage = (pageNumber=1,pageSize=15,domain) => requestPage("/user/role/page",pageNumber,pageSize,domain)
+export const reqRoleAdd = (domain) => request("/user/role",domain,"POST")
+export const reqRoleDetail = (domain) => request("/user/role/"+domain.id,domain,"GET")
+export const reqRoleUpdate = (domain) => request("/user/role",domain,"PUT")

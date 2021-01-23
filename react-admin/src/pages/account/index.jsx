@@ -1,131 +1,32 @@
-import React,{Component,useState} from 'react'
+import React,{Component,useState,useEffect} from 'react'
 import { Form, Row, Col, Input, Button,Table, Space,DatePicker,Card,Select,Modal} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
 import {reqAccountPage,reqPayWayList,reqAccountPayInfoAdd} from '../../api'
 
-const { RangePicker } = DatePicker;
+import SearchTable from '../../components/search-table'
+
 const { Option } = Select;
 
-const AdvanceSearchForm = ({onPage}) => {
-    const [expand,setExpand] = useState(false)
-    const [searchForm] = Form.useForm()
-    const getFields = () => {
-        //展开的输入框数量
-        const count = 6;
-        const children = [
-            (
-                <Col span={8} key="accountNo">
-                    <Form.Item
-                    name='accountNo'
-                    label='账户号'
-                    // rules={[
-                    //     {
-                    //     required: true,
-                    //     message: '请输入订单号!',
-                    //     },
-                    // ]}
-                    >
-                    <Input placeholder="请输入账户号" />
-                    </Form.Item>
-                </Col>
-            ),
-            (
-                <Col span={8} key="accountType">
-                    <Form.Item
-                    name='accountType'
-                    label='账户类型'
-                    // rules={[
-                    //     {
-                    //     required: true,
-                    //     message: '请选择账户类型',
-                    //     },
-                    // ]}
-                    >
-                        <Select defaultValue="merchant" style={{ width: 120 }}>
-                            <Option value="merchant">商户</Option>
-                            <Option value="user">用户</Option>
-                            <Option value="partner">合作商</Option>
-                        </Select>
-                    </Form.Item>
-                </Col>
-            ),
-            (
-                <Col span={8} key="userNo">
-                    <Form.Item
-                    name='userNo'
-                    label='用户编号'
-                    // rules={[
-                    //     {
-                    //     required: true,
-                    //     message: '请输入用户编号',
-                    //     },
-                    // ]}
-                    >
-                    <Input placeholder="请输入用户编号" />
-                    </Form.Item>
-                </Col>
-            ),
-        ]
-        return expand?children:children.slice(0,count);
-    }
+const Account = (props) => {
+    const [payWayList,setPayWayList] = useState([])
 
-    const onFinish = values =>{
-        onPage(values)
-    }
-
-    return (
-        <Form
-            form={searchForm}
-            name="advanced_search"
-            className="ant-advanced-search-form"
-            onFinish={onFinish}
-            >
-            <Row gutter={24}>{getFields()}</Row>
-            <Row>
-                <Col span={24} style={{ textAlign: 'right' }}>
-                <Button type="primary" htmlType="submit">
-                    搜索
-                </Button>
-                <Button
-                    style={{ margin: '0 8px' }}
-                    htmlType="submit"
-                    onClick={() => {
-                        searchForm.resetFields()
-                    }}
-                >
-                    重置
-                </Button>
-                <a
-                    style={{ fontSize: 12 }}
-                    onClick={() => {
-                        setExpand(!expand);
-                    }}
-                >
-                    {expand ? <UpOutlined /> : <DownOutlined />} {expand?"收起":"展开"}
-                </a>
-                </Col>
-            </Row>
-        </Form>
+    useEffect(() => {
+        reqPayWayList().then((data)=>{
+            setPayWayList({payWayList:data.data})
+        })
+        }, []
     )
-}
 
-export default class Account extends Component{
-    
-    state = {
-        data: [],
-        pagination:{
-            current: 1,
-            pageSize: 15
-        },
-        condition:{},
-        loading: false,
-        payInfoModalVisible: false,
-        payWayList: [],
-        currentDomain:{}
+    const getOptions = ()=>{
+        let options = []
+        // payWayList.forEach((element,index) => {
+        //     options.push(<Option value={element.payWayCode}>{element.payWayName}</Option>)
+        // })
+        return options
     }
 
-    columns = [
+    const columns = [
         {
           title: '账户编号',
           dataIndex: 'accountNo',
@@ -214,184 +115,133 @@ export default class Account extends Component{
         },
     ];
 
-    addAccountPayInfo = (values)=>{
-        const {accountNo} = this.state.currentDomain
-        debugger
-        reqAccountPayInfoAdd({accountNo:accountNo,...values})
-    }
-    
-    componentDidMount(){
-        this.getPage()
-        reqPayWayList().then((data)=>{
-            this.setState({payWayList:data.data})
-        })
-    }
-
-
-    getPage = (paginationParam) =>{
-        this.setState({ loading: true });
-        const {condition} = this.state
-        let pagination = paginationParam
-        if(!pagination){
-            pagination = this.state.pagination
-        }
-        const {current,pageSize} = pagination
-        reqAccountPage(current,pageSize,condition).then(result=>{
-            this.setState({
-                loading: false,
-                data:result.data.content,
-                pagination:{
-                    current:current,
-                    pageSize:pageSize,
-                    total:result.data.total
-                }
-            })
-        })
-    }
-
-    handleTableChange = (pagination)=>{
-        this.getPage(pagination)
-    }
-
-
-    render(){
-        const { data, pagination, loading,condition,payInfoModalVisible,payWayList} = this.state;
-        return (
-            <div>
-                <AdvanceSearchForm 
-                    onPage={(condition)=>{
-                        this.setState({condition})
-                        this.setState({pagination:{current:1}})
-                        this.getPage()
-                    }}
-                />
-                <Card style={{ marginTop: '16px' }} extra={<Button type="primary" onClick={()=>this.setAddVisible(true)}  shape="round">添加</Button>}>
-                    <Table 
-                        columns={this.columns} 
-                        dataSource={data} 
-                        pagination={pagination}
-                        loading={loading}
-                        onChange={this.handleTableChange}
-                        scroll={{x:2000}}
-                        />
-                </Card>
-                <AccountPayInfoModalForm 
-                    title="添加账户支付信息"
-                    visible={payInfoModalVisible}
-                    onCancel={()=>{
-                        this.setState({payInfoModalVisible:false})
-                    }}
-                    onOk={(values)=>{
-                        debugger
-                        this.addAccountPayInfo(values)
-                        this.setState({payInfoModalVisible:false})
-                    }}
-                    payWayList={payWayList}
-                />
-            </div>
-        )
-    }
-}
-
-const AccountPayInfoModalForm = ({title,visible,onCancel,onOk,initialValues={},payWayList}) => {
-    const [form] = Form.useForm()
-    if(initialValues){
-        form.setFieldsValue(initialValues)
-    }
-
-    const getOptions = ()=>{
-        const options = []
-        payWayList.forEach((element,index) => {
-            options.push(<Option value={element.payWayCode}>{element.payWayName}</Option>)
-        })
-        return options
-    }
-
-    return(
-        <Modal
-            title={title}
-            centered
-            visible={visible}
-            onOk={() => {
-                form.validateFields().then(values=>{
-                    onOk(values)
-                    form.resetFields();
-                })
-                .catch(info => {
-                    // console.log('验证失败:', info);
-                });
-            }}
-            onCancel={ ()=>{
-                onCancel()
-                form.resetFields();
-            }}
-            okText="确定"
-            cancelText="取消"
-            forceRender
-            >
-            <Form
-                form={form}
-                labelCol={{span:6}}
-                wrapperCol={{span:14}}
-                // initialValues={initialValues}
-                preserve={false}
-                >
+    const searchFormFields = [
+        (
+            <Col span={8} key="accountNo">
                 <Form.Item
-                    name="appId"
-                    label="appId"
-                    rules={[{
-                        required:true,
-                        message:'请输入appId'
-                    }]}
+                name='accountNo'
+                label='账户号'
+                // rules={[
+                //     {
+                //     required: true,
+                //     message: '请输入订单号!',
+                //     },
+                // ]}
                 >
-                    <Input></Input>
+                <Input placeholder="请输入账户号" />
                 </Form.Item>
+            </Col>
+        ),
+        (
+            <Col span={8} key="accountType">
                 <Form.Item
-                    name="appSecret"
-                    label="appSecret"
-                    rules={[{
-                        required:true,
-                        message:'请输入appSecret'
-                    }]}
+                name='accountType'
+                label='账户类型'
+                // rules={[
+                //     {
+                //     required: true,
+                //     message: '请选择账户类型',
+                //     },
+                // ]}
                 >
-                    <Input></Input>
-                </Form.Item>
-                <Form.Item
-                    name="merchantId"
-                    label="商户编号"
-                    rules={[{
-                        required:true,
-                        message:'请输入商户编号'
-                    }]}
-                >
-                    <Input placeholder="商户编号（微信，支付宝等提供）"></Input>
-                </Form.Item>
-                
-                <Form.Item
-                    name="partnerKey"
-                    label="partnerKey"
-                    rules={[{
-                        required:true,
-                        message:'请输入partnerKey'
-                    }]}
-                >
-                    <Input placeholder="请输入partnerKey"></Input>
-                </Form.Item>
-                <Form.Item
-                    name="payWayCode"
-                    label="支付方式"
-                    rules={[{
-                        required:true,
-                        message:'请选择支付方式'
-                    }]}
-                >
-                    <Select>
-                        {
-                            getOptions()
-                        }
+                    <Select defaultValue="merchant" style={{ width: 120 }}>
+                        <Option value="merchant">商户</Option>
+                        <Option value="user">用户</Option>
+                        <Option value="partner">合作商</Option>
                     </Select>
                 </Form.Item>
-            </Form>
-        </Modal>
+            </Col>
+        ),
+        (
+            <Col span={8} key="userNo">
+                <Form.Item
+                name='userNo'
+                label='用户编号'
+                // rules={[
+                //     {
+                //     required: true,
+                //     message: '请输入用户编号',
+                //     },
+                // ]}
+                >
+                <Input placeholder="请输入用户编号" />
+                </Form.Item>
+            </Col>
+        ),
+    ]
+
+    const addFormFields = [
+        (<Form.Item
+            name="appId"
+            label="appId"
+            rules={[{
+                required:true,
+                message:'请输入appId'
+            }]}
+        >
+            <Input></Input>
+        </Form.Item>),
+        (<Form.Item
+            name="appSecret"
+            label="appSecret"
+            rules={[{
+                required:true,
+                message:'请输入appSecret'
+            }]}
+        >
+            <Input></Input>
+        </Form.Item>),
+        (<Form.Item
+            name="merchantId"
+            label="商户编号"
+            rules={[{
+                required:true,
+                message:'请输入商户编号'
+            }]}
+        >
+            <Input placeholder="商户编号（微信，支付宝等提供）"></Input>
+        </Form.Item>
+        ),
+        (<Form.Item
+            name="partnerKey"
+            label="partnerKey"
+            rules={[{
+                required:true,
+                message:'请输入partnerKey'
+            }]}
+        >
+            <Input placeholder="请输入partnerKey"></Input>
+        </Form.Item>
+        ),
+        (<Form.Item
+            name="payWayCode"
+            label="支付方式"
+            rules={[{
+                required:true,
+                message:'请选择支付方式'
+            }]}
+        >
+            <Select >
+                {
+                    getOptions()
+                }
+            </Select>
+        </Form.Item>
+        )
+    ]
+    
+    
+
+    return (
+        <SearchTable 
+        columns={columns}
+        searchFormFields={searchFormFields}
+        requestPage={reqAccountPage}
+        addFormFields={addFormFields}
+        requestAdd={reqAccountPayInfoAdd}
+        />
     )
 }
+
+
+export default Account

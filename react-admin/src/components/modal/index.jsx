@@ -1,13 +1,18 @@
-export default function ModalForm({title,visible,onCancel,onOk,initialValues={}}){
+import React,{useState} from 'react'
+import { Form,Modal} from 'antd'
+
+const ModalForm = ({title,show,onCancel,onOk,initialValues={},formItems=[]}) => {
     const [form] = Form.useForm()
+
     if(initialValues){
         form.setFieldsValue(initialValues)
     }
+
     return(
         <Modal
             title={title}
             centered
-            visible={visible}
+            visible={show}
             onOk={() => {
                 form.validateFields().then(values=>{
                     onOk(values)
@@ -32,35 +37,10 @@ export default function ModalForm({title,visible,onCancel,onOk,initialValues={}}
                 // initialValues={initialValues}
                 preserve={false}
                 >
-                <Form.Item
-                    name="productName"
-                    label="支付产品名称"
-                    rules={[{
-                        required:true,
-                        message:'请输入支付产品名称'
-                    }]}
-                >
-                    <Input placeholder="支付产品名称"></Input>
-                </Form.Item>
-                <Form.Item
-                    name="productCode"
-                    label="支付产品编码"
-                    rules={[{
-                        required:true,
-                        message:'请输入支付产品编码'
-                    }]}
-                >
-                    <Input placeholder="支付产品编码"></Input>
-                </Form.Item>
-                <Form.Item
-                    name="auditStatus"
-                    label="审核状态"
-                    valuePropName="checked"
-                    initialValue={true}
-                >
-                    <Switch checked/>
-                </Form.Item>
+                {formItems}
             </Form>
         </Modal>
     )
 }
+
+export default ModalForm

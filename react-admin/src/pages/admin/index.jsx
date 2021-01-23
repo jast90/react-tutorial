@@ -24,6 +24,7 @@ import Store from '../store'
 import StoreGoods from '../store-goods'
 import StoreGoodsAdd from '../store-goods_add'
 import UserPage from '../user/user/page'
+import RolePage from '../user/role/page'
 
 const { Header, Footer, Sider, Content } = Layout;
 
@@ -72,6 +73,7 @@ export default class Admin extends Component{
                                 <Route path='/store/goods' component={StoreGoods}/>
                                 <Route path='/store' component={Store}/>
                                 <Route path='/user/page' component={UserPage}/>
+                                <Route path='/role/page' component={RolePage}/>
                             </Switch>
                         </Content>
                         <Footer><MyFooter /></Footer>
