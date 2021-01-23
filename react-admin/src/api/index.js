@@ -64,7 +64,6 @@ export const reqMenuList = ()=>{
         ,{path:"/store",title:"门店列表",icon:"<PieChartOutlined />"}
         ,{path:"/user",title:"用户",icon:"<PieChartOutlined />",children:[
             {path:"/user/page",title:"用户列表",icon:"<PieChartOutlined />"},
-            {path:"/user/add",title:"添加用户",icon:"<PieChartOutlined />"},
         ]}
     ]
 }
