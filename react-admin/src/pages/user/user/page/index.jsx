@@ -55,7 +55,7 @@ const User = (props) =>{
           ),
         },
     ]
-    const formFields = [
+    const searchFormFields = [
         (
             <Col span={8} key="userName">
                 <Form.Item
@@ -90,9 +90,7 @@ const User = (props) =>{
         ),
     ]
 
-    const reqPage = reqUserPage
-
-    const addFormItems = [
+    const addFormFields = [
         (<Form.Item
             key="userName"
             name="userName"
@@ -142,10 +140,10 @@ const User = (props) =>{
     return (
         <SearchTable 
         columns={columns}
-        formFields={formFields}
-        reqPage={reqPage}
-        addFormItems={addFormItems}
-        reqAdd={reqUserAdd}
+        searchFormFields={searchFormFields}
+        requestPage={reqUserPage}
+        addFormFields={addFormFields}
+        requestAdd={reqUserAdd}
         />
     )
 }

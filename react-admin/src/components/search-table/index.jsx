@@ -57,12 +57,12 @@ const SearchTable = (props) =>{
 
     //查询table的props
     const columns = props.columns
-    const formFields = props.formFields
-    const reqPage = props.reqPage
+    const searchFormFields = props.searchFormFields
+    const requestPage = props.requestPage
 
     //添加弹窗的props
-    const addFormItems = props.addFormItems
-    const reqAdd = props.reqAdd
+    const addFormFields = props.addFormFields
+    const requestAdd = props.requestAdd
 
     //查询table的状态
     const [data,setData] = useState([])
@@ -86,7 +86,7 @@ const SearchTable = (props) =>{
         }
         const {current,pageSize} = myPagination
         
-        reqPage(current,pageSize,condition).then(result=>{
+        requestPage(current,pageSize,condition).then(result=>{
             setLoading(false)
             setData(result.data.content)
             setPagination({
@@ -114,7 +114,7 @@ const SearchTable = (props) =>{
                         total: total
                     })
                 }}
-                formFields={formFields}
+                formFields={searchFormFields}
             />
             <Card style={{ marginTop: '16px' }} 
                 extra={
@@ -135,7 +135,7 @@ const SearchTable = (props) =>{
                     setAddModalShow(false)
                 }}
                 onOk={(values)=>{
-                    reqAdd(values).then(result => {
+                    requestAdd(values).then(result => {
                         if(result.code === 0){
                             setAddModalShow(false)
                             const {total,pageSize} = pagination
@@ -147,7 +147,7 @@ const SearchTable = (props) =>{
                         }
                     })
                 }}
-                formItems={addFormItems}
+                formItems={addFormFields}
                 
             />
         </div>
