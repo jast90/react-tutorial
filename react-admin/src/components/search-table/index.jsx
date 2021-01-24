@@ -1,11 +1,14 @@
 import React,{useState,useEffect} from 'react'
-import { Form, Row, Col, Button,Table,Card,Modal,Select,Space} from 'antd';
+import { Form, Row, Col, Button,Table,Card,Modal,Select,Space,Popconfirm,message} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 const { Option } = Select;
 const { Column, ColumnGroup } = Table;
 
 const SearchTable = (props) =>{
     const [expand,setExpand] = useState(false)
+    const [addModalShow,setAddModalShow] = useState(false)
+    const [updateModalShow,setUpdateModalShow] = useState(false)
+
     const [searchForm] = Form.useForm()
     const [addForm] = Form.useForm()
     const [updateForm] = Form.useForm()
@@ -13,29 +16,24 @@ const SearchTable = (props) =>{
     //查询table的props
     const columns = props.columns
     const searchFormFields = props.searchFormFields
+
+    // 请求
     const requestPage = props.requestPage
+    const requestAdd = props.requestAdd
     const requestUpdate = props.requestUpdate
-    const initValue = props.initValue
+    const reqRoleDetail = props.reqRoleDetail
+    const reqRoleDelete = props.reqRoleDelete
+
 
     //添加弹窗的props
     const editFormFields = props.addFormFields
-    const requestAdd = props.requestAdd
 
-    const addModalShow = props.addModalShow
-    const updateModalShow = props.updateModalShow
-    const onShowAddModal = props.onShowAddModal
-    const onHideAddModal = props.onHideAddModal
-    const onHideUpdateModal = props.onHideUpdateModal
 
     //查询table的状态
     const [data,setData] = useState([])
     const [pagination,setPagination] = useState({current: 1,pageSize: 15})
     const [condition,setCondition] = useState({})
     const [loading,setLoading] = useState(false)
-
-    if(initValue){
-        updateForm.setFieldsValue(initValue)
-    }
 
     useEffect(() => {
         getPage()
@@ -66,6 +64,10 @@ const SearchTable = (props) =>{
 
     const onSearch = (values) => {
         setCondition({values})
+        onReload()
+    }
+
+    const onReload = () =>{
         const {total,pageSize} = pagination
         getPage({
             current: 1,
@@ -111,15 +113,58 @@ const SearchTable = (props) =>{
             </Form>
             <Card style={{ marginTop: '16px' }} 
                 extra={
-                    <Button type="primary" onClick={onShowAddModal}  shape="round">添加</Button>}
+                    <Button type="primary" onClick={()=>{
+                        setAddModalShow(true)
+                    }}  shape="round">添加</Button>}
                 >
                 <Table 
-                    columns={columns} 
+                    // columns={columns} 
                     dataSource={data} 
                     pagination={pagination}
                     loading={loading}
                     onChange={handleTableChange}
+                    >
+                    {
+                        columns.map((column,index)=>{
+                            return (
+                                <Column title={column.title} dataIndex={column.dataIndex} key={column.key} fixed={column.fixed} render={column.render}/>
+                            )
+                        })
+
+                        
+                    }
+                    <Column
+                        title="操作"
+                        key="action"
+                        render={(text, record) => (
+                            <Space size="middle">
+                                <a onClick={()=>{
+                                    reqRoleDetail({id:record.id}).then(result=>{
+                                        if(result.code === 0){
+                                            updateForm.setFieldsValue(result.data)
+                                            setUpdateModalShow(true)
+                                        }
+                                    })
+                                }}>修改</a>
+                                    <Popconfirm
+                                        title="确定删除?"
+                                        onConfirm={()=>{
+                                            reqRoleDelete({id:record.id}).then(result=>{
+                                                if(result.code === 0){
+                                                    message.success("删除成功")
+                                                    getPage()
+                                                }
+                                            })
+                                        }}
+                                        okText="确定"
+                                        cancelText="取消"
+                                    >
+                                        <a href="#">删除</a>
+                                    </Popconfirm>
+                                </Space>
+                        )}
                     />
+                </Table>
             </Card>
             <Modal
                 title="添加"
@@ -130,13 +175,8 @@ const SearchTable = (props) =>{
                         addForm.resetFields();
                         requestAdd(values).then(result => {
                             if(result.code === 0){
-                                onHideAddModal()
-                                const {total,pageSize} = pagination
-                                getPage({
-                                    current: 1,
-                                    pageSize: pageSize,
-                                    total: total
-                                })
+                                setAddModalShow(false)
+                                onReload()
                             }
                         })
                     })
@@ -146,7 +186,7 @@ const SearchTable = (props) =>{
                 }}
                 onCancel={ ()=>{
                     addForm.resetFields();
-                    onHideAddModal()
+                    setAddModalShow(false)
                 }}
                 okText="确定"
                 cancelText="取消"
@@ -170,15 +210,9 @@ const SearchTable = (props) =>{
                     updateForm.validateFields().then(values=>{
                         requestUpdate(values).then(result => {
                             if(result.code === 0){
-                                onHideUpdateModal()
+                                setUpdateModalShow(false)
                                 updateForm.resetFields();
-                                const {total,pageSize} = pagination
-                                getPage({
-                                    current: 1,
-                                    pageSize: pageSize,
-                                    total: total
-                                })
-
+                                onReload()
                             }
                         })
                         
@@ -189,7 +223,7 @@ const SearchTable = (props) =>{
                 }}
                 onCancel={ ()=>{
                     updateForm.resetFields();
-                    onHideUpdateModal()
+                    setUpdateModalShow(false)
                 }}
                 okText="确定"
                 cancelText="取消"

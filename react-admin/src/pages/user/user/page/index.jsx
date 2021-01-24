@@ -1,7 +1,7 @@
 import React from 'react'
 import { Form, Col, Input, Space} from 'antd';
 
-import {reqUserPage,reqUserAdd} from '../../../../api'
+import {reqUserPage,reqUserAdd,reqUserDetail,reqUserDelete,reqUserUpdate} from '../../../../api'
 
 import SearchTable from '../../../../components/search-table'
 
@@ -41,18 +41,6 @@ const User = (props) =>{
           title: '用户来源',
           dataIndex: 'userFrom',
           key: 'userFrom',
-        },
-        
-        {
-          title: '操作',
-          key: 'action',
-          fixed: 'right',
-          width: 200,
-          render: (text, record) => (
-            <Space size="middle">
-              <a>角色</a>
-            </Space>
-          ),
         },
     ]
     const searchFormFields = [
@@ -139,11 +127,14 @@ const User = (props) =>{
 
     return (
         <SearchTable 
-        columns={columns}
-        searchFormFields={searchFormFields}
-        requestPage={reqUserPage}
-        addFormFields={addFormFields}
-        requestAdd={reqUserAdd}
+            columns={columns}
+            searchFormFields={searchFormFields}
+            addFormFields={addFormFields}
+            requestPage={reqUserPage}
+            requestAdd={reqUserAdd}
+            requestUpdate={reqUserUpdate}
+            reqRoleDelete={reqUserDelete}     
+            reqRoleDetail={reqUserDetail}      
         />
     )
 }

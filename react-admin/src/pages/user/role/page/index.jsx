@@ -1,14 +1,11 @@
 import React,{useState} from 'react'
-import { Form, Col, Input, Space} from 'antd';
+import { Form, Col, Input} from 'antd';
 
-import {reqRolePage,reqRoleAdd,reqRoleDetail,reqRoleUpdate} from '../../../../api'
+import {reqRolePage,reqRoleAdd,reqRoleDetail,reqRoleUpdate,reqRoleDelete} from '../../../../api'
 
 import SearchTable from '../../../../components/search-table'
 
 const Role = (props) =>{
-    const [addModalShow,setAddModalShow] = useState(false)
-    const [updateModalShow,setUpdateModalShow] = useState(false)
-    const [initValue,setInitValue] = useState({})
     
     const columns = [
         {
@@ -29,27 +26,6 @@ const Role = (props) =>{
             dataIndex: 'description',
             key: 'description',
           //   render: text => <a>{text}</a>,
-        },
-        {
-          title: '操作',
-          key: 'action',
-          fixed: 'right',
-          width: 200,
-          render: (text, record) => (
-            <Space size="middle">
-              <a >资源</a>
-              <a onClick={()=>{
-                  console.log(record.id)
-                  reqRoleDetail({id:record.id}).then(result=>{
-                    if(result.code === 0){
-                        setInitValue(result.data)
-                        console.log(initValue)
-                        setUpdateModalShow(true)
-                    }
-                  })
-              }}>修改</a>
-            </Space>
-          ),
         },
     ]
     const searchFormFields = [
@@ -134,22 +110,12 @@ const Role = (props) =>{
             <SearchTable 
                 columns={columns}
                 searchFormFields={searchFormFields}
-                requestPage={reqRolePage}
                 addFormFields={addFormFields}
+                requestPage={reqRolePage}
                 requestAdd={reqRoleAdd}
-                addModalShow={addModalShow}
-                onShowAddModal={()=>{
-                    setAddModalShow(true)
-                }}
-                onHideAddModal={()=>{
-                    setAddModalShow(false)
-                }}
-                updateModalShow={updateModalShow}
-                onHideUpdateModal={()=>{
-                    setUpdateModalShow(false)
-                }}
                 requestUpdate={reqRoleUpdate}
-                initValue={initValue}                
+                reqRoleDelete={reqRoleDelete}     
+                reqRoleDetail={reqRoleDetail}           
             />
         </div>
     )
