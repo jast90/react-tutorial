@@ -1,29 +1,217 @@
 import React,{useState,useEffect} from 'react'
-import { Form, Row, Col, Button,Table,Card,Modal,Select,Space,Popconfirm,message} from 'antd';
+import { Form, Col, Input, Row, Button,Table,Card,Modal,Select,Space,Popconfirm,message,TreeSelect} from 'antd';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 
+ /**
+  * 修改此处
+  */
+import {reqResourcePage,reqResourceAdd,reqResourceDetail,reqResourceUpdate,reqResourceDelete,reqResourceAll} from '../../../../api'
+
 const { Option } = Select;
-const { Column, ColumnGroup } = Table;
-
-const SearchTable = (props) =>{
-
-    //查询table的props
-    const columns = props.columns
-    const searchFormFields = props.searchFormFields
-
-    //添加弹窗的props
-    const addFormFields = props.addFormFields
-    const editFormFields = props.editFormFields
-
-    // 请求
-    const requestPage = props.requestPage
-    const requestAdd = props.requestAdd
-    const requestUpdate = props.requestUpdate
-    const requestDetail = props.requestDetail
-    const requestDelete = props.requestDetail
+const { Column} = Table;
+const { SHOW_PARENT } = TreeSelect;
 
 
+const Resource = (props) =>{
+    
+    /**
+     * 修改此处
+     */
+    const [resourceTree,setResourceTree] = useState([])
 
+    const columns = [
+        {
+          title: '名称',
+          dataIndex: 'resource',
+          key: 'resource',
+          fixed:"left",
+        //   render: text => <a>{text}</a>,
+        },
+        {
+            title: '类型',
+            dataIndex: 'type',
+            key: 'type',
+          //   render: text => <a>{text}</a>,
+        },
+        {
+            title: '编码',
+            dataIndex: 'code',
+            key: 'code',
+          //   render: text => <a>{text}</a>,
+        },
+        {
+            title: '图标',
+            dataIndex: 'icon',
+            key: 'icon',
+          //   render: text => <a>{text}</a>,
+        },
+        {
+            title: '排序',
+            dataIndex: 'rank',
+            key: 'rank',
+          //   render: text => <a>{text}</a>,
+        },
+    ]
+
+    const searchFormFields = [
+        (
+            <Col span={8} key="resource">
+                <Form.Item
+                key="resource"
+                name='resource'
+                label='名称'
+                // rules={[
+                //     {
+                //     required: true,
+                //     message: '请输入名称!',
+                //     },
+                // ]}
+                >
+                <Input placeholder="请输入名称" />
+                </Form.Item>
+            </Col>
+        ),
+        (
+            <Col span={8} key="code">
+                <Form.Item
+                key="code"
+                name='code'
+                label='编码'
+                // rules={[
+                //     {
+                //     required: true,
+                //     message: '请输入用户名!',
+                //     },
+                // ]}
+                >
+                <Input placeholder="请输入编码" />
+                </Form.Item>
+            </Col>
+        ),
+        (
+            <Col span={8} key="type">
+                <Form.Item
+                key="type"
+                name='type'
+                label='类型'
+                // rules={[
+                //     {
+                //     required: true,
+                //     message: '请输入用户名!',
+                //     },
+                // ]}
+                >
+                <Input placeholder="请输入类型" />
+                </Form.Item>
+            </Col>
+        ),
+        (
+            <Col span={8} key="rank">
+                <Form.Item
+                key="rank"
+                name='rank'
+                label='排序'
+                // rules={[
+                //     {
+                //     required: true,
+                //     message: '请输入用户名!',
+                //     },
+                // ]}
+                >
+                <Input placeholder="请输入排序" />
+                </Form.Item>
+            </Col>
+        ),
+    ]
+
+    const onLoadResourceTree = ()=>{
+        
+    }
+
+    const addFormFields = [
+        (<Form.Item name="id" style={{ display: 'none' }}>
+            <Input type="text" />
+        </Form.Item>
+        ),
+        (<Form.Item
+            key="parentId"
+            name="parentId"
+            label="父级"
+        >
+            <TreeSelect 
+                multiple={false}
+                placeholder={"请选择父级"}
+                treeData={resourceTree}
+                allowClear={true}
+             />
+        </Form.Item>),
+        (<Form.Item
+            key="resource"
+            name="resource"
+            label="名称"
+            rules={[{
+                required:true,
+                message:'请输入名称'
+            }]}
+        >
+            <Input placeholder="名称"></Input>
+        </Form.Item>),
+        (<Form.Item
+            key="code"
+            name="code"
+            label="编码"
+            rules={[{
+                required:true,
+                message:'请输入编码'
+            }]}
+        >
+            <Input placeholder="编码"></Input>
+        </Form.Item>),
+        
+        (<Form.Item
+            key="type"
+            name="type"
+            label="类型"
+            rules={[{
+                required:true,
+                message:'请输入类型'
+            }]}
+        >
+            <Input placeholder="类型" ></Input>
+        </Form.Item>),
+        (<Form.Item
+            key="icon"
+            name="icon"
+            label="图标"
+            rules={[{
+                required:false,
+                message:'请输入图标'
+            }]}
+        >
+            <Input placeholder="图标" ></Input>
+        </Form.Item>),
+        (<Form.Item
+            key="rank"
+            name="rank"
+            label="排序"
+            rules={[{
+                required:false,
+                message:'请输入排序'
+            }]}
+        >
+            <Input placeholder="排序" ></Input>
+        </Form.Item>),
+    ]
+
+    
+
+    const requestPage = reqResourcePage
+    const requestAdd = reqResourceAdd
+    const requestDetail = reqResourceDetail
+    const requestUpdate = reqResourceUpdate
+    const requestDelete = reqResourceDelete
+
+    
     const [expand,setExpand] = useState(false)
     const [addModalShow,setAddModalShow] = useState(false)
     const [updateModalShow,setUpdateModalShow] = useState(false)
@@ -37,7 +225,18 @@ const SearchTable = (props) =>{
             }
         })
     }
+    const onRequestTreeData = ()=>{
+        reqResourceAll().then(result=>{
+            setResourceTree(result.data)
+        })   
+    }
+    const onAddModalShow = ()=>{
+        onRequestTreeData()
+        setAddModalShow(true)
+    }
+
     const onEdit = (id) => {
+        onRequestTreeData()
         requestDetail({id:id}).then(result=>{
             if(result.code === 0){
                 updateForm.setFieldsValue(result.data)
@@ -178,9 +377,7 @@ const SearchTable = (props) =>{
             </Form>
             <Card style={{ marginTop: '16px' }} 
                 extra={
-                    <Button type="primary" onClick={()=>{
-                        setAddModalShow(true)
-                    }}  shape="round">添加</Button>}
+                    <Button type="primary" onClick={onAddModalShow}  shape="round">添加</Button>}
                 >
                 <Table 
                     // columns={columns} 
@@ -257,11 +454,13 @@ const SearchTable = (props) =>{
                     wrapperCol={{span:14}}
                     preserve={false}
                     >
-                    {editFormFields}
+                    {addFormFields}
                 </Form>
             </Modal>
         </div>
     )
 }
 
-export default SearchTable
+
+
+export default Resource

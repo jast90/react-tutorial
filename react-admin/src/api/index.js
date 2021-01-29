@@ -65,6 +65,8 @@ export const reqMenuList = ()=>{
         ,{path:"/user",title:"用户",icon:"<PieChartOutlined />",children:[
             {path:"/user/page",title:"用户列表",icon:"<PieChartOutlined />"},
             {path:"/role/page",title:"角色列表",icon:"<PieChartOutlined />"},
+            {path:"/resource/page",title:"资源列表",icon:"<PieChartOutlined />"},
+            {path:"/permission/page",title:"权限列表",icon:"<PieChartOutlined />"},
         ]}
     ]
 }
@@ -138,3 +140,18 @@ export const reqRoleAdd = (domain) => request("/user/role",domain,"POST")
 export const reqRoleDetail = (domain) => request("/user/role/"+domain.id,domain,"GET")
 export const reqRoleUpdate = (domain) => request("/user/role",domain,"PUT")
 export const reqRoleDelete = (domain) => request("/user/role/"+domain.id,domain,"DELETE")
+export const reqRoleList = (domain) => request("/user/role/list",domain,"GET")
+
+export const reqResourcePage = (pageNumber=1,pageSize=15,domain) => requestPage("/user/resource/page",pageNumber,pageSize,domain)
+export const reqResourceAdd = (domain) => request("/user/resource",domain,"POST")
+export const reqResourceDetail = (domain) => request("/user/resource/"+domain.id,domain,"GET")
+export const reqResourceUpdate = (domain) => request("/user/resource",domain,"PUT")
+export const reqResourceDelete = (domain) => request("/user/resource/"+domain.id,domain,"DELETE")
+export const reqResourceAll = (domain) => request("/user/resource/all",domain,"GET")
+
+export const reqPermissionPage = (pageNumber=1,pageSize=15,domain) => requestPage("/user/permission/page",pageNumber,pageSize,domain)
+export const reqPermissionAdd = (domain) => request("/user/permission",domain,"POST")
+export const reqPermissionDetail = (domain) => request("/user/permission/"+domain.id,domain,"GET")
+export const reqPermissionUpdate = (domain) => request("/user/permission",domain,"PUT")
+export const reqPermissionDelete = (domain) => request("/user/permission/"+domain.id,domain,"DELETE")
+export const reqPermissionAll = (domain) => request("/user/permission/all",domain,"GET")

@@ -25,6 +25,8 @@ import StoreGoods from '../store-goods'
 import StoreGoodsAdd from '../store-goods_add'
 import UserPage from '../user/user/page'
 import RolePage from '../user/role/page'
+import Resource from '../user/resource/page'
+import Permission from '../user/permission/page'
 
 const { Header, Footer, Sider, Content } = Layout;
 
@@ -74,6 +76,8 @@ export default class Admin extends Component{
                                 <Route path='/store' component={Store}/>
                                 <Route path='/user/page' component={UserPage}/>
                                 <Route path='/role/page' component={RolePage}/>
+                                <Route path='/resource/page' component={Resource}/>
+                                <Route path='/permission/page' component={Permission}/>
                             </Switch>
                         </Content>
                         <Footer><MyFooter /></Footer>
