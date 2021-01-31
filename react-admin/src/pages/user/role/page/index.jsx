@@ -23,20 +23,33 @@ const Role = (props) =>{
     const [selectedPermissions,setSelectedPermissions] = useState([])
     const [addedResources,setAddedResources] = useState([])
     const [addedPermissions,setAddedPermissions] = useState([])
-
-    
+    const [addMap,setAddMap] = useState(new Map())    
 
     const onAddResourcePermissions = (values)=>{
-        console.log(selectedResources)
-        console.log(selectedPermissions)
         addedResources.push(selectedResources)
         addedPermissions.push(selectedPermissions)
-        let list = [];
-        let ps = selectedPermissions.map(selectedPermission=>selectedPermission.children).join(",")
-        console.log(ps)
+
         selectedResources.forEach(selectedResource=>{
-            list.push({resource:selectedResource.resource,permissions:ps})
+            if(addMap.get(selectedResource.id)){
+                for(const item of selectedPermissions){
+                    addMap.get(selectedResource.id).permissions.add(item)
+                }
+            }else{
+                addMap.set(selectedResource.id,{resource : selectedResource, permissions : new Set(selectedPermissions)})
+            }
         })
+        
+        let list = [];
+        let ps 
+        for(const resourceId of addMap.keys()){
+            const entity = addMap.get(resourceId);
+            ps = "";
+            for(const permission of entity.permissions){
+                ps += permission.children + ","
+            }
+            list.push({resource:entity.resource.resource,resourceId:entity.resource.id,permissions:ps})
+        }
+        
         setResourcePermissions(list)
         addResourcePermissionForm.resetFields()
         setSelectedResources([])
@@ -226,7 +239,7 @@ const Role = (props) =>{
     const [searchForm] = Form.useForm()
     const [addForm] = Form.useForm()
     const [updateForm] = Form.useForm()
-    const [updateForm1] = Form.useForm()
+    const [basicInfoForm] = Form.useForm()
     const [addResourcePermissionForm] = Form.useForm()
 
     useEffect(() => {
@@ -271,8 +284,30 @@ const Role = (props) =>{
     
     const onHideDrawer = () => {
         setAddDrawerShow(false)
+        setAddMap(new Map())
+        setResourcePermissions([])
     }
 
+    const addOnFinish = (values) => {
+        console.log(values)
+        console.log(addMap)
+        let resourcePermissionIds = []
+        let permissionIds = []
+        for(let resourceId of addMap.keys()){
+            for(const permission of addMap.get(resourceId).permissions.values()){
+                permissionIds.push(permission.key)
+            }
+            resourcePermissionIds.push({resourceId : resourceId,permissionIds : permissionIds})
+        }
+        console.log(resourcePermissionIds)
+        requestAdd({...values,list: resourcePermissionIds}).then(result =>{
+            if(result.code === 0){
+                onHideDrawer()
+                onReload()
+                basicInfoForm.resetFields()
+            }
+        })
+    }
 
     return (
         <div>
@@ -415,18 +450,21 @@ const Role = (props) =>{
                     <Button onClick={onHideDrawer} style={{ marginRight: 8 }}>
                         取消
                     </Button>
-                    <Button onClick={onHideDrawer} type="primary">
+                    <Button onClick={()=>{
+                        basicInfoForm.submit()
+                    }} type="primary">
                         提交
                     </Button>
                     </div>
                 }
                 >
                     <Form
-                        form={updateForm1}
+                        form={basicInfoForm}
                         labelCol={{span:6}}
                         wrapperCol={{span:14}}
                         // initialValues={initialValues}
                         preserve={false}
+                        onFinish={addOnFinish}
                         >
                         <Card title="基本信息" bordered={false} key="basic">
                         {addFormFields}
