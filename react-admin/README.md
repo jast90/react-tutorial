@@ -18,6 +18,8 @@ docker build -t mall-app -f Dockerfile .
 
 ## 功能截图
 
-![user-add](./images/user-add.png)
+![user add](./images/user-add.png)
 
-![resource-add](./images/resource-add.png)
+![resource add](./images/resource-add.png)
+
+![role update](./images/role-update.png)
