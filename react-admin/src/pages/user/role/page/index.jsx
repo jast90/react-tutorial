@@ -3,8 +3,6 @@ import { Drawer,Form, Col, Input, Row, Button,Table,Card,Modal,Select,Space,Popc
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import {reqRolePage,reqRoleAdd,reqRoleDetail,reqRoleUpdate,reqRoleDelete,reqResourceAll,reqPermissionAll} from '../../../../api'
 
-import SearchTable from '../../../../components/search-table'
-
 const { SHOW_PARENT } = TreeSelect;
 const { Option } = Select;
 const { Column, ColumnGroup } = Table;
@@ -23,7 +21,8 @@ const Role = (props) =>{
     const [selectedPermissions,setSelectedPermissions] = useState([])
     const [addedResources,setAddedResources] = useState([])
     const [addedPermissions,setAddedPermissions] = useState([])
-    const [addMap,setAddMap] = useState(new Map())    
+    const [addMap,setAddMap] = useState(new Map())
+    const [add,setAdd] = useState(true)    
 
     const onAddResourcePermissions = (values)=>{
         addedResources.push(selectedResources)
@@ -31,30 +30,47 @@ const Role = (props) =>{
 
         selectedResources.forEach(selectedResource=>{
             if(addMap.get(selectedResource.id)){
+                let temp = addMap.get(selectedResource.id).permissions
+                let permissionIdSet = new Set()
+                for(const permission of temp){
+                    permissionIdSet.add(permission.id)
+                }
                 for(const item of selectedPermissions){
-                    addMap.get(selectedResource.id).permissions.add(item)
+                    if(!permissionIdSet.has(item.value)){
+                        addMap.get(selectedResource.id).permissions.push({id:item.value,name:item.children})
+                    }
                 }
             }else{
-                addMap.set(selectedResource.id,{resource : selectedResource, permissions : new Set(selectedPermissions)})
+                let myPermissions = []
+                for(const item of selectedPermissions){
+                    console.log(item)
+                    myPermissions.push({id:item.value,name:item.children})
+                }
+                addMap.set(selectedResource.id,{resource : selectedResource, permissions : myPermissions})
             }
         })
         
+        updateResourcePermissions()
+
+        addResourcePermissionForm.resetFields()
+        setSelectedResources([])
+        setSelectedPermissions([])
+    }
+
+    const updateResourcePermissions = () => {
         let list = [];
         let ps 
         for(const resourceId of addMap.keys()){
             const entity = addMap.get(resourceId);
             ps = "";
             for(const permission of entity.permissions){
-                ps += permission.children + ","
+                ps += permission.name + ","
             }
-            list.push({resource:entity.resource.resource,resourceId:entity.resource.id,permissions:ps})
+            list.push({resource:entity.resource.resource,id:entity.resource.id,permissions:ps})
         }
-        
         setResourcePermissions(list)
-        addResourcePermissionForm.resetFields()
-        setSelectedResources([])
-        setSelectedPermissions([])
     }
+
     const requestTreeData = ()=>{
         reqResourceAll().then(result=>{
             setResourceTree(result.data)
@@ -165,10 +181,11 @@ const Role = (props) =>{
     ]
 
     const [expand,setExpand] = useState(false)
-    const [addModalShow,setAddModalShow] = useState(false)
-    const [updateModalShow,setUpdateModalShow] = useState(false)
     const [addDrawerShow,setAddDrawerShow] = useState(false)
 
+    const [searchForm] = Form.useForm()
+    const [addBasicInfoForm] = Form.useForm()
+    const [addResourcePermissionForm] = Form.useForm()
 
     const onDelete = (id)=>{
         requestDelete({id:id}).then(result=>{
@@ -179,52 +196,25 @@ const Role = (props) =>{
         })
     }
     const onEdit = (id) => {
+        setAdd(false)
         requestDetail({id:id}).then(result=>{
             if(result.code === 0){
-                updateForm.setFieldsValue(result.data)
-                setUpdateModalShow(true)
+                // setUpdateModalShow(true)
+                addBasicInfoForm.setFieldsValue(result.data.role)
+                setAddDrawerShow(true)
+                
+                if(result.data.resourcePermissionVoList){
+                    for(const item of result.data.resourcePermissionVoList){
+                        if(item){
+                            addMap.set(item.id,{resource : item, permissions : item.permissions})
+                        }
+                    }
+                    updateResourcePermissions()
+                }
             }
         })
     }
 
-    const onUpdateOk = () => {
-        updateForm.validateFields().then(values=>{
-            requestUpdate(values).then(result => {
-                if(result.code === 0){
-                    setUpdateModalShow(false)
-                    updateForm.resetFields();
-                    onReload()
-                }
-            })
-            
-        })
-        .catch(info => {
-            // console.log('验证失败:', info);
-        });
-    }
-    const onUpdateCancel = () => {
-        updateForm.resetFields();
-        setUpdateModalShow(false)
-    }
-
-    const onAddCancel = ()=>{
-        addForm.resetFields();
-        setAddModalShow(false)
-    }
-    const onAddOk = () => {
-        addForm.validateFields().then(values=>{
-            addForm.resetFields();
-            requestAdd(values).then(result => {
-                if(result.code === 0){
-                    setAddModalShow(false)
-                    onReload()
-                }
-            })
-        })
-        .catch(info => {
-            // console.log('验证失败:', info);
-        });
-    }
 
     /**
      * 以下是固定不变的
@@ -236,17 +226,15 @@ const Role = (props) =>{
     const [condition,setCondition] = useState({})
     const [loading,setLoading] = useState(false)
 
-    const [searchForm] = Form.useForm()
-    const [addForm] = Form.useForm()
-    const [updateForm] = Form.useForm()
-    const [basicInfoForm] = Form.useForm()
-    const [addResourcePermissionForm] = Form.useForm()
+
 
     useEffect(() => {
         getPage()
+        requestTreeData()
+        requestPermissions()
       }, [])
 
-    const getPage = (paginationParam) =>{
+    const getPage = (paginationParam) => {
         setLoading(true)
         let myPagination = paginationParam
         if(!myPagination){
@@ -260,7 +248,7 @@ const Role = (props) =>{
                 setData(result.data.content)
                 setPagination({
                     current:current,
-                    pageSize:pageSize,
+                    pageSize:pageSize, 
                     total:result.data.total
                 })
             }
@@ -286,27 +274,46 @@ const Role = (props) =>{
         setAddDrawerShow(false)
         setAddMap(new Map())
         setResourcePermissions([])
+        setSelectedPermissions([])
+        setSelectedResources([])
+        addBasicInfoForm.resetFields()
+        addResourcePermissionForm.resetFields()
     }
 
     const addOnFinish = (values) => {
-        console.log(values)
-        console.log(addMap)
         let resourcePermissionIds = []
-        let permissionIds = []
         for(let resourceId of addMap.keys()){
-            for(const permission of addMap.get(resourceId).permissions.values()){
-                permissionIds.push(permission.key)
+            let permissionIds = []
+            for(const permission of addMap.get(resourceId).permissions){
+                permissionIds.push(permission.id)
             }
             resourcePermissionIds.push({resourceId : resourceId,permissionIds : permissionIds})
         }
         console.log(resourcePermissionIds)
-        requestAdd({...values,list: resourcePermissionIds}).then(result =>{
-            if(result.code === 0){
-                onHideDrawer()
-                onReload()
-                basicInfoForm.resetFields()
-            }
-        })
+        console.log(addMap)
+        if(add){
+            requestAdd({...values,list: resourcePermissionIds}).then(result =>{
+                if(result.code === 0){
+                    onHideDrawer()
+                    onReload()
+                    addBasicInfoForm.resetFields()
+                }
+            })
+        }else{
+            requestUpdate({...values,list: resourcePermissionIds}).then(result =>{
+                if(result.code === 0){
+                    onHideDrawer()
+                    onReload()
+                    addBasicInfoForm.resetFields()
+                }
+            })
+        }
+        
+    }
+
+    const deleteAddMap = (id)=>{
+        addMap.delete(id)
+        updateResourcePermissions()
     }
 
     return (
@@ -347,13 +354,9 @@ const Role = (props) =>{
                 extra={
                     <div>
                     <Button type="primary" onClick={()=>{
-                        setAddModalShow(true)
-                    }}  shape="round">添加</Button>
-                    <Button type="primary" onClick={()=>{
                         setAddDrawerShow(true)
-                        requestTreeData()
-                        requestPermissions()
-                        }}  shape="round">添加2</Button>
+                        setAdd(true)
+                        }}  shape="round">添加</Button>
                     </div>
                     }
                 >
@@ -381,62 +384,23 @@ const Role = (props) =>{
                                 <a onClick={()=>{
                                     onEdit(record.id)
                                 }}>修改</a>
-                                    <Popconfirm
-                                        title="确定删除?"
-                                        onConfirm={()=>{
-                                            onDelete(record.id)
-                                        }}
-                                        okText="确定"
-                                        cancelText="取消"
-                                    >
-                                        <a href="#">删除</a>
-                                    </Popconfirm>
-                                </Space>
+                                <Popconfirm
+                                    title="确定删除?"
+                                    onConfirm={()=>{
+                                        onDelete(record.id)
+                                    }}
+                                    okText="确定"
+                                    cancelText="取消"
+                                >
+                                    <a href="#">删除</a>
+                                </Popconfirm>
+                            </Space>
                         )}
                     />
                 </Table>
             </Card>
-            <Modal
-                title="添加"
-                centered
-                visible={addModalShow}
-                onOk={onAddOk}
-                onCancel={ onAddCancel}
-                okText="确定"
-                cancelText="取消"
-                forceRender
-                >
-                <Form
-                    form={addForm}
-                    labelCol={{span:6}}
-                    wrapperCol={{span:14}}
-                    // initialValues={initialValues}
-                    preserve={false}
-                    >
-                    {addFormFields}
-                </Form>
-            </Modal>
-            <Modal
-                title="修改"
-                centered
-                visible={updateModalShow}
-                onOk={onUpdateOk}
-                onCancel={ onUpdateCancel}
-                okText="确定"
-                cancelText="取消"
-                forceRender
-                >
-                <Form
-                    form={updateForm}
-                    labelCol={{span:6}}
-                    wrapperCol={{span:14}}
-                    preserve={false}
-                    >
-                    {addFormFields}
-                </Form>
-            </Modal>
             <Drawer
-                title="创建角色"
+                title={add?"创建角色":"修改角色"}
                 width={720}
                 onClose={onHideDrawer}
                 visible={addDrawerShow}
@@ -451,7 +415,7 @@ const Role = (props) =>{
                         取消
                     </Button>
                     <Button onClick={()=>{
-                        basicInfoForm.submit()
+                        addBasicInfoForm.submit()
                     }} type="primary">
                         提交
                     </Button>
@@ -459,7 +423,7 @@ const Role = (props) =>{
                 }
                 >
                     <Form
-                        form={basicInfoForm}
+                        form={addBasicInfoForm}
                         labelCol={{span:6}}
                         wrapperCol={{span:14}}
                         // initialValues={initialValues}
@@ -555,10 +519,17 @@ const Role = (props) =>{
                                     title: '权限',
                                     dataIndex: 'permissions',
                                     key: 'permissions',
+                                },
+                                {
+                                    title: '操作',
+                                    dataIndex: 'actions',
+                                    key: 'actions',
+                                    render: (text,record) => <a onClick={()=>{
+                                        deleteAddMap(record.id)
+                                    }}>删除</a>,
                                 }]} 
                                 dataSource={resourcePermissions} />
                     </Card>
-                   
                 </Drawer>
         </div>
     )
